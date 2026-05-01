@@ -1,0 +1,54 @@
+
+<style>
+  .scene { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 28px; display: flex; justify-content: center; }
+  .popover { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 14px; width: 220px; display: flex; flex-direction: column; gap: 10px; }
+  .pill-row { display: flex; gap: 6px; }
+  .pill { flex: 1; display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+  .pill.sel { border-color: #534AB7; background: #EEEDFE; }
+  .pill-dots { display: flex; gap: 2px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .pill-name { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); }
+  .pill.sel .pill-name { color: #3C3489; }
+  .seg-row { display: flex; background: var(--color-background-secondary); border-radius: 20px; padding: 3px; gap: 2px; }
+  .seg-btn { flex: 1; padding: 6px 4px; border-radius: 20px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 500; line-height: 1.3; color: var(--color-text-tertiary); }
+  .seg-btn.sel { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+</style>
+
+<h2 class="sr-only">Refined compact theme switcher popover with theme pills, light/dark mode segmented control, and high contrast segmented control.</h2>
+
+<div style="padding: 1rem 0;">
+  <div class="scene">
+    <div class="popover">
+
+      <div class="pill-row">
+        <div class="pill sel">
+          <div class="pill-dots">
+            <div class="dot" style="background:#534AB7;"></div>
+            <div class="dot" style="background:#1D9E75;"></div>
+            <div class="dot" style="background:#D85A30;"></div>
+          </div>
+          <span class="pill-name">Default</span>
+        </div>
+        <div class="pill">
+          <div class="pill-dots">
+            <div class="dot" style="background:#185FA5;"></div>
+            <div class="dot" style="background:#D4537E;"></div>
+            <div class="dot" style="background:#BA7517;"></div>
+          </div>
+          <span class="pill-name">Ocean</span>
+        </div>
+      </div>
+
+      <div class="seg-row">
+        <div class="seg-btn sel">☀ Light</div>
+        <div class="seg-btn">☾ Dark</div>
+      </div>
+
+      <div class="seg-row">
+        <div class="seg-btn sel">◑ Standard</div>
+        <div class="seg-btn">◉ High contrast</div>
+      </div>
+
+    </div>
+  </div>
+</div>
