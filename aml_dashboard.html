@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentinel — AML & Fraud Investigations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --font: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --bg: #0d0f12;
+    --bg-surface: #13161b;
+    --bg-raised: #1a1e25;
+    --bg-hover: #1f242d;
+    --bg-selected: #151d2b;
+    --border: rgba(255,255,255,0.07);
+    --border-md: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.2);
+    --text-primary: #e8eaed;
+    --text-secondary: #8b909a;
+    --text-tertiary: #555b66;
+    --blue: #4b9cf5;
+    --blue-dim: rgba(75,156,245,0.12);
+    --blue-border: rgba(75,156,245,0.3);
+    --red: #f55b5b;
+    --red-dim: rgba(245,91,91,0.1);
+    --red-border: rgba(245,91,91,0.25);
+    --amber: #f5a623;
+    --amber-dim: rgba(245,166,35,0.1);
+    --amber-border: rgba(245,166,35,0.25);
+    --green: #52c97a;
+    --green-dim: rgba(82,201,122,0.1);
+    --sidebar-width: 220px;
+    --topbar-h: 52px;
+    --metrics-h: 76px;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: var(--topbar-h) var(--metrics-h) 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 24px; }
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 8px var(--blue);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .logo-sub { color: var(--text-tertiary); font-weight: 400; letter-spacing: 0.04em; }
+  .tabs { display: flex; gap: 2px; }
+  .tab {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--text-secondary);
+    border: none;
+    background: none;
+    font-family: var(--font);
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+  .tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+  .tab.active { background: var(--bg-raised); color: var(--text-primary); }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .sla-badge {
+    background: var(--red-dim);
+    border: 1px solid var(--red-border);
+    color: var(--red);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+  }
+  .user-chip { display: flex; align-items: center; gap: 8px; }
+  .user-name { font-size: 12px; color: var(--text-secondary); }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--blue-dim);
+    border: 1px solid var(--blue-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500; color: var(--blue);
+    font-family: var(--font-mono);
+  }
+
+  /* METRICS ROW */
+  .metrics-bar {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .metric {
+    background: var(--bg-surface);
+    padding: 10px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .metric-label {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+  }
+  .metric-row { display: flex; align-items: baseline; gap: 8px; }
+  .metric-value { font-size: 22px; font-weight: 300; color: var(--text-primary); line-height: 1; }
+  .metric-value.red { color: var(--red); }
+  .metric-delta { font-size: 10px; font-family: var(--font-mono); }
+  .delta-up { color: var(--red); }
+  .delta-down { color: var(--green); }
+  .delta-flat { color: var(--text-tertiary); }
+  .risk-bar-wrap { height: 2px; background: var(--bg-raised); border-radius: 1px; margin-top: 4px; }
+  .risk-bar-fill { height: 2px; border-radius: 1px; background: var(--red); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+  .nav-section {
+    padding: 10px 14px 4px;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .nav-item:hover:not(.active) { color: var(--text-primary); background: var(--bg-hover); }
+  .nav-item.active {
+    color: var(--text-primary);
+    border-left: 2px solid var(--blue);
+    background: var(--bg-selected);
+    font-weight: 500;
+  }
+  .nav-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.55; }
+  .nav-item.active .nav-icon { opacity: 0.9; }
+  .nav-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--bg-raised);
+    color: var(--text-tertiary);
+    border: 1px solid var(--border);
+  }
+  .nav-count.urgent { background: var(--red-dim); color: var(--red); border-color: var(--red-border); }
+
+  /* MAIN CONTENT */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    overflow: hidden;
+  }
+
+  /* QUEUE PANEL */
+  .queue-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+  .queue-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    flex-shrink: 0;
+  }
+  .queue-title { font-size: 12.5px; font-weight: 500; color: var(--text-primary); }
+  .queue-subtitle { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; font-family: var(--font-mono); }
+  .filter-group { display: flex; gap: 4px; }
+  .filter-btn {
+    font-size: 11px;
+    padding: 3px 9px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-family: var(--font);
+    transition: all 0.12s;
+  }
+  .filter-btn:hover { border-color: var(--border-md); color: var(--text-primary); }
+  .filter-btn.active { background: var(--bg-raised); color: var(--text-primary); border-color: var(--border-md); }
+
+  .col-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 88px 72px 76px 44px;
+    gap: 10px;
+    padding: 6px 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .col-h {
+    font-size: 9px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+  }
+  .col-h.right { text-align: right; }
+  .col-h.center { text-align: center; }
+
+  .queue-list { overflow-y: auto; flex: 1; }
+  .queue-list::-webkit-scrollbar { width: 3px; }
+  .queue-list::-webkit-scrollbar-track { background: transparent; }
+  .queue-list::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+  .alert-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 88px 72px 76px 44px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    background: var(--bg-surface);
+    border-left: 2px solid transparent;
+    transition: background 0.12s;
+  }
+  .alert-row:hover { background: var(--bg-hover); }
+  .alert-row.selected {
+    background: var(--bg-selected);
+    border-left: 2px solid var(--blue);
+  }
+
+  .risk-chip {
+    width: 36px; height: 36px;
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500;
+    font-family: var(--font-mono);
+  }
+  .risk-crit { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+  .risk-high { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+  .risk-med { background: var(--green-dim); color: var(--green); border: 1px solid rgba(82,201,122,0.25); }
+
+  .alert-entity { font-size: 12.5px; font-weight: 500; color: var(--text-primary); }
+  .alert-typology { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .alert-amount { font-size: 12px; font-weight: 500; text-align: right; font-family: var(--font-mono); color: var(--text-primary); }
+  .alert-sla { font-size: 11px; text-align: center; font-family: var(--font-mono); }
+  .sla-urgent { color: var(--red); font-weight: 500; }
+  .sla-ok { color: var(--text-tertiary); }
+
+  .status-pill {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    text-align: center;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+  .pill-new { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
+  .pill-review { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+  .pill-escalated { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+  .pill-closed { background: var(--green-dim); color: var(--green); border: 1px solid rgba(82,201,122,0.25); }
+
+  .assignee {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 500;
+    font-family: var(--font-mono);
+    margin: auto;
+  }
+  .a-blue { background: rgba(75,156,245,0.15); color: var(--blue); border: 1px solid var(--blue-border); }
+  .a-purple { background: rgba(138,99,210,0.15); color: #8a63d2; border: 1px solid rgba(138,99,210,0.3); }
+  .a-teal { background: rgba(52,190,180,0.15); color: #34beb4; border: 1px solid rgba(52,190,180,0.3); }
+  .a-none { background: var(--bg-raised); color: var(--text-tertiary); border: 1px dashed var(--border-md); }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    background: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .detail-scroll { overflow-y: auto; flex: 1; }
+  .detail-scroll::-webkit-scrollbar { width: 3px; }
+  .detail-scroll::-webkit-scrollbar-track { background: transparent; }
+  .detail-scroll::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+  .detail-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .detail-case-id {
+    font-size: 9px;
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+  .detail-name { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+  .detail-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .tag-red { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+  .tag-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+  .tag-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
+  .tag-gray { background: var(--bg-raised); color: var(--text-secondary); border: 1px solid var(--border-md); }
+
+  .detail-section {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-section-title {
+    font-size: 9px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--text-tertiary);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+  }
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3.5px 0;
+  }
+  .kv-key { font-size: 11.5px; color: var(--text-secondary); }
+  .kv-val { font-size: 11.5px; font-weight: 500; color: var(--text-primary); font-family: var(--font-mono); }
+  .kv-val.red { color: var(--red); }
+  .kv-val.amber { color: var(--amber); }
+
+  .txn-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .txn-item:last-child { border-bottom: none; }
+  .txn-desc { font-size: 11.5px; color: var(--text-primary); }
+  .txn-meta { font-size: 10px; color: var(--text-tertiary); font-family: var(--font-mono); margin-top: 2px; }
+  .txn-amount { font-size: 12px; font-weight: 500; font-family: var(--font-mono); white-space: nowrap; }
+  .txn-in { color: var(--green); }
+  .txn-out { color: var(--red); }
+
+  .sparkline-wrap { margin-top: 10px; }
+  .spark-label { font-size: 9px; color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 5px; }
+  .sparkline { display: flex; align-items: flex-end; gap: 2px; height: 32px; }
+  .spark-bar { flex: 1; border-radius: 1px 1px 0 0; background: rgba(75,156,245,0.25); transition: background 0.15s; }
+  .spark-bar.hi { background: rgba(245,91,91,0.5); }
+  .spark-bar:hover { background: var(--blue); }
+  .spark-bar.hi:hover { background: var(--red); }
+
+  /* ACTIONS */
+  .action-section { padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .action-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-md);
+    background: var(--bg-raised);
+    cursor: pointer;
+    color: var(--text-secondary);
+    text-align: left;
+    font-family: var(--font);
+    transition: all 0.12s;
+    line-height: 1.4;
+  }
+  .action-btn:hover { border-color: var(--border-strong); color: var(--text-primary); background: var(--bg-hover); }
+  .action-btn.primary {
+    background: rgba(75,156,245,0.12);
+    border-color: var(--blue-border);
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .action-btn.primary:hover { background: rgba(75,156,245,0.2); border-color: var(--blue); }
+
+  /* AUDIT LOG in detail */
+  .audit-item {
+    display: flex;
+    gap: 9px;
+    padding: 5px 0;
+    align-items: flex-start;
+  }
+  .audit-time { font-size: 10px; color: var(--text-tertiary); font-family: var(--font-mono); white-space: nowrap; margin-top: 1px; }
+  .audit-text { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
+  .audit-who { color: var(--blue); }
+
+  /* SCROLLBAR for queue */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+  /* EMPTY state */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: var(--text-tertiary); gap: 8px; padding: 40px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 28px; opacity: 0.3; }
+  .empty-text { font-size: 13px; }
+
+  /* Notification dot */
+  .notif-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 6px var(--red);
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo">
+        <div class="logo-dot"></div>
+        SENTINEL
+        <span class="logo-sub">/ AML &amp; Fraud Investigations</span>
+      </div>
+      <div class="tabs">
+        <button class="tab active">Investigations</button>
+        <button class="tab">Analytics</button>
+        <button class="tab">Rules Engine</button>
+        <button class="tab">Reporting</button>
+        <button class="tab">Settings</button>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="sla-badge">⚠ 12 SLA breaching</div>
+      <div class="user-chip">
+        <span class="user-name">Sarah Kim · Analyst II</span>
+        <div class="avatar">SK</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- METRICS ROW -->
+  <div class="metrics-bar">
+    <div class="metric">
+      <div class="metric-label">Open alerts</div>
+      <div class="metric-row">
+        <div class="metric-value">341</div>
+        <div class="metric-delta delta-up">↑18</div>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Avg risk score</div>
+      <div class="metric-row">
+        <div class="metric-value">74</div>
+        <div class="metric-delta delta-up">↑6 pts</div>
+      </div>
+      <div class="risk-bar-wrap"><div class="risk-bar-fill" style="width:74%"></div></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">SLA breaching</div>
+      <div class="metric-row">
+        <div class="metric-value red">12</div>
+        <div class="metric-delta delta-up">↑4 today</div>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Closed today</div>
+      <div class="metric-row">
+        <div class="metric-value">47</div>
+        <div class="metric-delta delta-down">↓3 vs avg</div>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">SAR filed MTD</div>
+      <div class="metric-row">
+        <div class="metric-value">9</div>
+        <div class="metric-delta delta-flat">→ on target</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">Queue</div>
+    <div class="nav-item active" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="3" rx="1" fill="currentColor" opacity=".8"/><rect x="1" y="6" width="14" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="11" width="9" height="3" rx="1" fill="currentColor" opacity=".3"/></svg>
+      My queue
+      <span class="nav-count urgent">24</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      SLA urgent
+      <span class="nav-count urgent">12</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M2 4h12M2 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      All alerts
+      <span class="nav-count">341</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Escalated
+      <span class="nav-count urgent">7</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12L8 4l6 8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      Closed
+      <span class="nav-count">189</span>
+    </div>
+
+    <div class="nav-section" style="margin-top:6px;">Workflows</div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M4 4h8M4 8h5M4 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      SAR drafts
+      <span class="nav-count">3</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="11" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="11" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7l2-2M7 9l2 2" stroke="currentColor" stroke-width="1.5"/></svg>
+      Network links
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="9" width="12" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M8 2v7M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Evidence vault
+    </div>
+
+    <div class="nav-section" style="margin-top:6px;">Analytics</div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 13l3-4 3 2 3-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Performance
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="1" width="10" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 5h4M6 8h4M6 11h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Audit log
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      False positive report
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- QUEUE PANEL -->
+    <div class="queue-panel">
+      <div class="queue-header">
+        <div>
+          <div class="queue-title">Alert queue</div>
+          <div class="queue-subtitle">24 assigned · 12 SLA breaching</div>
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
+          <button class="filter-btn" onclick="setFilter(this,'critical')">Critical ≥90</button>
+          <button class="filter-btn" onclick="setFilter(this,'sla')">SLA ↑</button>
+          <button class="filter-btn" onclick="setFilter(this,'unassigned')">Unassigned</button>
+        </div>
+      </div>
+      <div class="col-header">
+        <div class="col-h">Risk</div>
+        <div class="col-h">Entity / typology</div>
+        <div class="col-h right">Amount</div>
+        <div class="col-h center">SLA</div>
+        <div class="col-h center">Status</div>
+        <div class="col-h center">Owner</div>
+      </div>
+      <div class="queue-list" id="queue-list"></div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel">
+      <div class="detail-scroll" id="detail-panel">
+        <div class="empty-state">
+          <div class="empty-icon">↖</div>
+          <div class="empty-text">Select an alert to investigate</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const ALERTS = [
+  {
+    id:'CASE-2024-08471', status:'AML / ESCALATED', risk:94, riskClass:'risk-crit',
+    entity:'Meridian Trade LLC', typology:'Structuring / layering — wire series',
+    amount:'$487,200', sla:'2h 14m', slaClass:'sla-urgent',
+    statusLabel:'Escalated', statusClass:'pill-escalated',
+    owner:'SK', ownerClass:'a-blue', filter:['all','critical','sla'],
+    tags:['Risk 94','SLA 2h 14m','Structuring','Wire series','Corp account'],
+    tagClasses:['tag-red','tag-red','tag-amber','tag-blue','tag-gray'],
+    profile:[
+      ['Entity type','LLC — import/export',''],
+      ['Opened','Mar 2019',''],
+      ['Prior SARs','2 filed','red'],
+      ['Risk tier','High',''],
+      ['Jurisdiction','DE (UBO: Panama)','amber']
+    ],
+    summary:[
+      ['Total flagged','$487,200',''],
+      ['Txn count','9 wires (6 days)',''],
+      ['Rule triggered','WIRE-STRUCT-004',''],
+      ['Counterparty','3 new entities','amber']
+    ],
+    spark:[30,45,55,80,95,100,90], sparkHi:[3,4,5,6],
+    txns:[
+      {d:'Wire to Orion Capital SA',m:'Apr 28 · BIC: BCEFPAPA',a:'−$98,500',out:true},
+      {d:'Wire to Orion Capital SA',m:'Apr 27 · BIC: BCEFPAPA',a:'−$97,000',out:true},
+      {d:'Inbound — Coastal Metals Inc',m:'Apr 27 · ACH',a:'+$199,400',out:false},
+      {d:'Wire to Apex Trade BV',m:'Apr 26 · BIC: INGBNL2A',a:'−$88,200',out:true}
+    ],
+    audit:[
+      {t:'14:22','txt':'Escalated by <span class="audit-who">MR</span> — pattern matches FATF typology 8'},
+      {t:'11:05','txt':'Review opened by <span class="audit-who">SK</span>'},
+      {t:'09:30','txt':'Alert generated by WIRE-STRUCT-004'}
+    ],
+    actions:[
+      {l:'Draft SAR narrative →', primary:true, note:'File within 2h 14m'},
+      {l:'View network links →', primary:false},
+      {l:'Disposition guidance →', primary:false}
+    ]
+  },
+  {
+    id:'CASE-2024-08445', status:'AML / IN REVIEW', risk:91, riskClass:'risk-crit',
+    entity:'Alicia Vargova', typology:'Rapid fund movement — same-day out',
+    amount:'$212,000', sla:'4h 01m', slaClass:'sla-urgent',
+    statusLabel:'In review', statusClass:'pill-review',
+    owner:'SK', ownerClass:'a-blue', filter:['all','critical','sla'],
+    tags:['Risk 91','SLA 4h 01m','Rapid movement','Same-day out'],
+    tagClasses:['tag-red','tag-red','tag-amber','tag-blue'],
+    profile:[
+      ['Customer type','Individual — retail',''],
+      ['Opened','Jan 2022',''],
+      ['Prior SARs','None',''],
+      ['Risk tier','Medium',''],
+      ['Jurisdiction','NY, USA','']
+    ],
+    summary:[
+      ['Total flagged','$212,000',''],
+      ['Txn count','4 transfers (1 day)',''],
+      ['Rule triggered','VEL-SAME-DAY-002',''],
+      ['Pattern','In $200k → out $212k / 6h','amber']
+    ],
+    spark:[5,5,10,8,12,100,90], sparkHi:[5,6],
+    txns:[
+      {d:'Inbound wire — Unknown Corp',m:'Apr 29 · Wire',a:'+$212,000',out:false},
+      {d:'Zelle to Marcus Webb',m:'Apr 29 · Zelle',a:'−$70,000',out:true},
+      {d:'Wire to Belize account',m:'Apr 29 · SWIFT',a:'−$80,000',out:true},
+      {d:'Crypto exchange withdrawal',m:'Apr 29 · Coinbase',a:'−$62,000',out:true}
+    ],
+    audit:[
+      {t:'13:44','txt':'Assigned to <span class="audit-who">SK</span>'},
+      {t:'13:41','txt':'Alert generated by VEL-SAME-DAY-002'}
+    ],
+    actions:[
+      {l:'Draft SAR narrative →', primary:true, note:'File within 4h 01m'},
+      {l:'Check prior cases →', primary:false},
+      {l:'Disposition guidance →', primary:false}
+    ]
+  },
+  {
+    id:'CASE-2024-08390', status:'AML / IN REVIEW', risk:78, riskClass:'risk-high',
+    entity:'Dalton & Sons Import', typology:'Trade-based ML — invoice mismatch',
+    amount:'$1,024,500', sla:'11h 30m', slaClass:'sla-ok',
+    statusLabel:'In review', statusClass:'pill-review',
+    owner:'MR', ownerClass:'a-purple', filter:['all'],
+    tags:['Risk 78','Trade-based ML','Invoice mismatch','Corp account'],
+    tagClasses:['tag-amber','tag-amber','tag-blue','tag-gray'],
+    profile:[
+      ['Entity type','LLC — commodities',''],
+      ['Opened','Nov 2017',''],
+      ['Prior SARs','1 filed','red'],
+      ['Risk tier','High',''],
+      ['Jurisdiction','TX (Trade: China, UAE)','amber']
+    ],
+    summary:[
+      ['Total flagged','$1,024,500',''],
+      ['Txn count','12 trade payments (30d)',''],
+      ['Rule triggered','TBML-INVOICE-007',''],
+      ['Anomaly','Invoice values 40% above market','amber']
+    ],
+    spark:[40,55,50,60,65,70,80], sparkHi:[6],
+    txns:[
+      {d:'Payment to Shenzhen Metals Co',m:'Apr 25 · SWIFT',a:'−$290,000',out:true},
+      {d:'Payment to Gulf Trade LLC',m:'Apr 20 · SWIFT',a:'−$188,500',out:true},
+      {d:'Inbound — US distributor',m:'Apr 18 · Wire',a:'+$510,000',out:false},
+      {d:'Payment to Shenzhen Metals Co',m:'Apr 12 · SWIFT',a:'−$195,000',out:true}
+    ],
+    audit:[
+      {t:'10:15','txt':'Assigned to <span class="audit-who">MR</span>'},
+      {t:'09:58','txt':'Alert generated by TBML-INVOICE-007'},
+      {t:'09:58','txt':'Linked to prior case <span class="audit-who">CASE-2023-06211</span>'}
+    ],
+    actions:[
+      {l:'Request invoice docs →', primary:true, note:'Awaiting customer docs'},
+      {l:'Check counterparties →', primary:false},
+      {l:'Disposition guidance →', primary:false}
+    ]
+  },
+  {
+    id:'CASE-2024-08342', status:'AML / NEW', risk:71, riskClass:'risk-high',
+    entity:'Kristopher Adler', typology:'PEP — large cash withdrawal pattern',
+    amount:'$98,750', sla:'1d 3h', slaClass:'sla-ok',
+    statusLabel:'New', statusClass:'pill-new',
+    owner:'—', ownerClass:'a-none', filter:['all','unassigned'],
+    tags:['Risk 71','PEP','Cash pattern','High net worth'],
+    tagClasses:['tag-amber','tag-amber','tag-blue','tag-gray'],
+    profile:[
+      ['Customer type','Individual — PEP',''],
+      ['Opened','Aug 2020',''],
+      ['Prior SARs','None',''],
+      ['Risk tier','High',''],
+      ['Jurisdiction','FL, USA (Dual: Colombia)','amber']
+    ],
+    summary:[
+      ['Total flagged','$98,750',''],
+      ['Txn count','8 cash w/d (14 days)',''],
+      ['Rule triggered','CASH-PEP-003',''],
+      ['All w/d','≤$9,900 each','amber']
+    ],
+    spark:[20,35,40,55,60,70,80], sparkHi:[4,5,6],
+    txns:[
+      {d:'Cash withdrawal — Branch 44',m:'Apr 28 · ATM',a:'−$9,900',out:true},
+      {d:'Cash withdrawal — Branch 12',m:'Apr 26 · Teller',a:'−$9,900',out:true},
+      {d:'Deposit — wire from Bogotá',m:'Apr 25 · SWIFT',a:'+$50,000',out:false},
+      {d:'Cash withdrawal — Branch 31',m:'Apr 23 · ATM',a:'−$9,800',out:true}
+    ],
+    audit:[
+      {t:'08:00','txt':'Alert generated by CASH-PEP-003'},
+      {t:'08:00','txt':'Unassigned — pending queue'}
+    ],
+    actions:[
+      {l:'Assign to me →', primary:true},
+      {l:'PEP screening report →', primary:false},
+      {l:'Disposition guidance →', primary:false}
+    ]
+  },
+  {
+    id:'CASE-2024-08291', status:'AML / NEW', risk:68, riskClass:'risk-high',
+    entity:'NovaClear Holdings', typology:'Shell company — layered ownership',
+    amount:'$2,150,000', sla:'1d 8h', slaClass:'sla-ok',
+    statusLabel:'New', statusClass:'pill-new',
+    owner:'JL', ownerClass:'a-teal', filter:['all'],
+    tags:['Risk 68','Shell co.','UBO unknown','Wire'],
+    tagClasses:['tag-amber','tag-amber','tag-red','tag-gray'],
+    profile:[
+      ['Entity type','Holding Co. — Cayman Is.',''],
+      ['Opened','Feb 2024',''],
+      ['Prior SARs','None',''],
+      ['Risk tier','High',''],
+      ['Jurisdiction','Cayman / BVI (UBO: unknown)','red']
+    ],
+    summary:[
+      ['Total flagged','$2,150,000',''],
+      ['Txn count','3 large wires (7 days)',''],
+      ['Rule triggered','CORP-UBO-MISSING-001',''],
+      ['UBO docs','Not on file','red']
+    ],
+    spark:[0,0,0,60,80,100,0], sparkHi:[3,4,5],
+    txns:[
+      {d:'Wire from anonymous trust',m:'Apr 27 · SWIFT',a:'+$900,000',out:false},
+      {d:'Wire to Dubai entity',m:'Apr 26 · SWIFT',a:'−$750,000',out:true},
+      {d:'Wire from anonymous trust',m:'Apr 24 · SWIFT',a:'+$1,250,000',out:false},
+      {d:'Wire to Panama entity',m:'Apr 23 · SWIFT',a:'−$400,000',out:true}
+    ],
+    audit:[
+      {t:'07:45','txt':'Assigned to <span class="audit-who">JL</span>'},
+      {t:'07:44','txt':'Alert generated by CORP-UBO-MISSING-001'}
+    ],
+    actions:[
+      {l:'Request UBO docs →', primary:true, note:'30-day KYC deadline'},
+      {l:'View network links →', primary:false},
+      {l:'Disposition guidance →', primary:false}
+    ]
+  },
+  {
+    id:'CASE-2024-08255', status:'AML / NEW', risk:44, riskClass:'risk-med',
+    entity:'Priya Mehta', typology:'Peer anomaly — atypical merchant spend',
+    amount:'$14,220', sla:'2d 1h', slaClass:'sla-ok',
+    statusLabel:'New', statusClass:'pill-new',
+    owner:'SK', ownerClass:'a-blue', filter:['all'],
+    tags:['Risk 44','Peer anomaly','Retail','Card'],
+    tagClasses:['tag-gray','tag-gray','tag-gray','tag-gray'],
+    profile:[
+      ['Customer type','Individual — retail',''],
+      ['Opened','Jun 2021',''],
+      ['Prior SARs','None',''],
+      ['Risk tier','Low',''],
+      ['Jurisdiction','CA, USA','']
+    ],
+    summary:[
+      ['Total flagged','$14,220',''],
+      ['Txn count','22 card txns (7 days)',''],
+      ['Rule triggered','PEER-MERCHANT-009',''],
+      ['Anomaly','7x peer group spend','amber']
+    ],
+    spark:[10,12,8,14,20,60,65], sparkHi:[5,6],
+    txns:[
+      {d:'Nordstrom — card purchase',m:'Apr 28 · Visa',a:'−$3,400',out:true},
+      {d:'Saks Fifth Ave — card purchase',m:'Apr 27 · Visa',a:'−$2,200',out:true},
+      {d:'Payroll deposit',m:'Apr 25 · ACH',a:'+$6,800',out:false},
+      {d:'Neiman Marcus — card purchase',m:'Apr 24 · Visa',a:'−$1,850',out:true}
+    ],
+    audit:[
+      {t:'06:30','txt':'Alert generated by PEER-MERCHANT-009'}
+    ],
+    actions:[
+      {l:'Review customer profile →', primary:true},
+      {l:'Close — no suspicious activity →', primary:false},
+      {l:'Request explanation →', primary:false}
+    ]
+  },
+  {
+    id:'CASE-2024-08204', status:'AML / NEW', risk:38, riskClass:'risk-med',
+    entity:'Blue Arch Partners', typology:'Dormant account — reactivation spike',
+    amount:'$61,400', sla:'2d 6h', slaClass:'sla-ok',
+    statusLabel:'New', statusClass:'pill-new',
+    owner:'—', ownerClass:'a-none', filter:['all','unassigned'],
+    tags:['Risk 38','Dormant','Reactivation','Wire'],
+    tagClasses:['tag-gray','tag-gray','tag-gray','tag-gray'],
+    profile:[
+      ['Entity type','Partnership',''],
+      ['Opened','Apr 2016',''],
+      ['Prior SARs','None',''],
+      ['Last activity','3 years ago','amber'],
+      ['Jurisdiction','NV, USA','']
+    ],
+    summary:[
+      ['Total flagged','$61,400',''],
+      ['Txn count','5 wires (3 days)',''],
+      ['Rule triggered','DORM-REACT-002',''],
+      ['Dormant for','38 months','amber']
+    ],
+    spark:[0,0,0,0,80,90,85], sparkHi:[4,5,6],
+    txns:[
+      {d:'Wire from unknown sender',m:'Apr 27 · SWIFT',a:'+$25,000',out:false},
+      {d:'Wire to EU account',m:'Apr 27 · SWIFT',a:'−$22,000',out:true},
+      {d:'Wire from unknown sender',m:'Apr 26 · SWIFT',a:'+$36,400',out:false},
+      {d:'Wire to EU account',m:'Apr 26 · SWIFT',a:'−$39,400',out:true}
+    ],
+    audit:[
+      {t:'05:15','txt':'Alert generated by DORM-REACT-002'},
+      {t:'05:15','txt':'Unassigned — pending queue'}
+    ],
+    actions:[
+      {l:'Assign to me →', primary:true},
+      {l:'Review account history →', primary:false},
+      {l:'Disposition guidance →', primary:false}
+    ]
+  }
+];
+
+let activeFilter = 'all';
+let selectedIdx = null;
+
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setFilter(btn, f) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = f;
+  renderQueue();
+  document.getElementById('detail-panel').innerHTML = '<div class="empty-state"><div class="empty-icon">↖</div><div class="empty-text">Select an alert to investigate</div></div>';
+  selectedIdx = null;
+}
+
+function renderQueue() {
+  const list = document.getElementById('queue-list');
+  const filtered = ALERTS.filter(a => a.filter.includes(activeFilter));
+  list.innerHTML = filtered.map((a, i) => `
+    <div class="alert-row${selectedIdx === a.id ? ' selected' : ''}" onclick="selectAlert('${a.id}')">
+      <div class="risk-chip ${a.riskClass}">${a.risk}</div>
+      <div>
+        <div class="alert-entity">${a.entity}</div>
+        <div class="alert-typology">${a.typology}</div>
+      </div>
+      <div class="alert-amount">${a.amount}</div>
+      <div class="alert-sla ${a.slaClass}">${a.sla}</div>
+      <div><span class="status-pill ${a.statusClass}">${a.statusLabel}</span></div>
+      <div class="assignee ${a.ownerClass}">${a.owner}</div>
+    </div>
+  `).join('');
+}
+
+function selectAlert(id) {
+  selectedIdx = id;
+  renderQueue();
+  const c = ALERTS.find(a => a.id === id);
+  if (!c) return;
+
+  const tagHtml = c.tags.map((t,i) => `<span class="tag ${c.tagClasses[i]}">${t}</span>`).join('');
+  const profileHtml = c.profile.map(r => `
+    <div class="kv-row">
+      <span class="kv-key">${r[0]}</span>
+      <span class="kv-val ${r[2] ? r[2] : ''}">${r[1]}</span>
+    </div>`).join('');
+  const summaryHtml = c.summary.map(r => `
+    <div class="kv-row">
+      <span class="kv-key">${r[0]}</span>
+      <span class="kv-val ${r[2] ? r[2] : ''}">${r[1]}</span>
+    </div>`).join('');
+  const sparkHtml = c.spark.map((h, i) =>
+    `<div class="spark-bar${c.sparkHi.includes(i) ? ' hi' : ''}" style="height:${Math.max(h,4)}%"></div>`
+  ).join('');
+  const txnHtml = c.txns.map(t => `
+    <div class="txn-item">
+      <div>
+        <div class="txn-desc">${t.d}</div>
+        <div class="txn-meta">${t.m}</div>
+      </div>
+      <div class="txn-amount ${t.out ? 'txn-out' : 'txn-in'}">${t.a}</div>
+    </div>`).join('');
+  const auditHtml = c.audit.map(a => `
+    <div class="audit-item">
+      <div class="audit-time">${a.t}</div>
+      <div class="audit-text">${a.txt}</div>
+    </div>`).join('');
+  const actionHtml = c.actions.map(a => `
+    <button class="action-btn${a.primary ? ' primary' : ''}">
+      ${a.l}${a.note ? `<div style="font-size:10px;opacity:0.7;margin-top:2px;">${a.note}</div>` : ''}
+    </button>`).join('');
+
+  document.getElementById('detail-panel').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-case-id">${c.id} · ${c.status}</div>
+      <div class="detail-name">${c.entity}</div>
+      <div class="detail-tags">${tagHtml}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Customer profile</div>
+      ${profileHtml}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Alert summary</div>
+      ${summaryHtml}
+      <div class="sparkline-wrap">
+        <div class="spark-label">Daily volume — 7 days</div>
+        <div class="sparkline">${sparkHtml}</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Recent transactions</div>
+      ${txnHtml}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Audit trail</div>
+      ${auditHtml}
+    </div>
+    <div class="action-section">
+      ${actionHtml}
+    </div>
+  `;
+}
+
+renderQueue();
+selectAlert('CASE-2024-08471');
+</script>
+</body>
+</html>
