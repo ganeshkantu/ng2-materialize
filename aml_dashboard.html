@@ -6,1032 +6,1158 @@
 <title>Sentinel — AML & Fraud Investigations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --font: 'IBM Plex Sans', sans-serif;
-    --font-mono: 'IBM Plex Mono', monospace;
-    --bg: #0d0f12;
-    --bg-surface: #13161b;
-    --bg-raised: #1a1e25;
-    --bg-hover: #1f242d;
-    --bg-selected: #151d2b;
-    --border: rgba(255,255,255,0.07);
-    --border-md: rgba(255,255,255,0.12);
-    --border-strong: rgba(255,255,255,0.2);
-    --text-primary: #e8eaed;
-    --text-secondary: #8b909a;
-    --text-tertiary: #555b66;
-    --blue: #4b9cf5;
-    --blue-dim: rgba(75,156,245,0.12);
-    --blue-border: rgba(75,156,245,0.3);
-    --red: #f55b5b;
-    --red-dim: rgba(245,91,91,0.1);
-    --red-border: rgba(245,91,91,0.25);
-    --amber: #f5a623;
-    --amber-dim: rgba(245,166,35,0.1);
-    --amber-border: rgba(245,166,35,0.25);
-    --green: #52c97a;
-    --green-dim: rgba(82,201,122,0.1);
-    --sidebar-width: 220px;
-    --topbar-h: 52px;
-    --metrics-h: 76px;
-    --radius: 6px;
-    --radius-lg: 10px;
-  }
+:root {
+  --font: 'Syne', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --bg: #0a0c0f;
+  --bg-1: #0f1218;
+  --bg-2: #141820;
+  --bg-3: #1a1f2a;
+  --bg-4: #1f2535;
+  --border: rgba(255,255,255,0.06);
+  --border-2: rgba(255,255,255,0.11);
+  --border-3: rgba(255,255,255,0.18);
+  --text-1: #e2e6ed;
+  --text-2: #8892a0;
+  --text-3: #4a5260;
+  --text-4: #2e3440;
+  --blue: #5ba3f5;
+  --blue-glow: rgba(91,163,245,0.15);
+  --blue-border: rgba(91,163,245,0.28);
+  --red: #f56060;
+  --red-glow: rgba(245,96,96,0.12);
+  --red-border: rgba(245,96,96,0.28);
+  --amber: #f5aa40;
+  --amber-glow: rgba(245,170,64,0.1);
+  --amber-border: rgba(245,170,64,0.28);
+  --green: #4fd88a;
+  --green-glow: rgba(79,216,138,0.1);
+  --tab-w: 48px;
+  --topbar-h: 48px;
+  --r: 6px;
+  --r2: 10px;
+}
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text-primary);
-    font-size: 13px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text-1); font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
-  /* LAYOUT */
-  .layout {
-    display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr;
-    grid-template-rows: var(--topbar-h) var(--metrics-h) 1fr;
-    height: 100vh;
-    overflow: hidden;
-  }
+/* ── SHELL ── */
+.shell { display: grid; grid-template-rows: var(--topbar-h) 1fr; height: 100vh; }
 
-  /* TOPBAR */
-  .topbar {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    background: var(--bg-surface);
-    border-bottom: 1px solid var(--border);
-  }
-  .topbar-left { display: flex; align-items: center; gap: 24px; }
-  .logo {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
-    letter-spacing: 0.1em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--blue);
-    box-shadow: 0 0 8px var(--blue);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-  .logo-sub { color: var(--text-tertiary); font-weight: 400; letter-spacing: 0.04em; }
-  .tabs { display: flex; gap: 2px; }
-  .tab {
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    color: var(--text-secondary);
-    border: none;
-    background: none;
-    font-family: var(--font);
-    transition: all 0.15s;
-    letter-spacing: 0.01em;
-  }
-  .tab:hover { color: var(--text-primary); background: var(--bg-hover); }
-  .tab.active { background: var(--bg-raised); color: var(--text-primary); }
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .sla-badge {
-    background: var(--red-dim);
-    border: 1px solid var(--red-border);
-    color: var(--red);
-    font-size: 11px;
-    font-family: var(--font-mono);
-    padding: 3px 9px;
-    border-radius: 20px;
-    letter-spacing: 0.02em;
-  }
-  .user-chip { display: flex; align-items: center; gap: 8px; }
-  .user-name { font-size: 12px; color: var(--text-secondary); }
-  .avatar {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: var(--blue-dim);
-    border: 1px solid var(--blue-border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 500; color: var(--blue);
-    font-family: var(--font-mono);
-  }
+/* ── TOPBAR ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; color: var(--text-1); }
+.logo-pip { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 10px var(--blue); animation: blink 2.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.logo-sep { color: var(--text-3); margin: 0 2px; }
+.topbar-center { display: flex; gap: 2px; }
+.t-tab { font-size: 11.5px; padding: 4px 12px; border-radius: var(--r); border: none; background: none; color: var(--text-2); cursor: pointer; font-family: var(--font); letter-spacing: 0.02em; transition: all .15s; }
+.t-tab:hover { color: var(--text-1); background: var(--bg-3); }
+.t-tab.on { background: var(--bg-3); color: var(--text-1); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.sla-pill { font-family: var(--mono); font-size: 10px; background: var(--red-glow); border: 1px solid var(--red-border); color: var(--red); padding: 3px 9px; border-radius: 20px; }
+.usr { display: flex; align-items: center; gap: 8px; }
+.usr-name { font-size: 11px; color: var(--text-2); }
+.avi { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-glow); border: 1px solid var(--blue-border); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--blue); }
 
-  /* METRICS ROW */
-  .metrics-bar {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .metric {
-    background: var(--bg-surface);
-    padding: 10px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .metric-label {
-    font-size: 10px;
-    color: var(--text-tertiary);
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    font-family: var(--font-mono);
-  }
-  .metric-row { display: flex; align-items: baseline; gap: 8px; }
-  .metric-value { font-size: 22px; font-weight: 300; color: var(--text-primary); line-height: 1; }
-  .metric-value.red { color: var(--red); }
-  .metric-delta { font-size: 10px; font-family: var(--font-mono); }
-  .delta-up { color: var(--red); }
-  .delta-down { color: var(--green); }
-  .delta-flat { color: var(--text-tertiary); }
-  .risk-bar-wrap { height: 2px; background: var(--bg-raised); border-radius: 1px; margin-top: 4px; }
-  .risk-bar-fill { height: 2px; border-radius: 1px; background: var(--red); }
+/* ── BODY ── */
+.body-row { display: flex; height: 100%; overflow: hidden; }
 
-  /* SIDEBAR */
-  .sidebar {
-    background: var(--bg-surface);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    padding: 12px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-  .sidebar::-webkit-scrollbar { width: 3px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
-  .nav-section {
-    padding: 10px 14px 4px;
-    font-size: 9px;
-    font-weight: 500;
-    color: var(--text-tertiary);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-family: var(--font-mono);
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 7px 14px;
-    font-size: 12.5px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-left: 2px solid transparent;
-    transition: all 0.12s;
-    user-select: none;
-  }
-  .nav-item:hover:not(.active) { color: var(--text-primary); background: var(--bg-hover); }
-  .nav-item.active {
-    color: var(--text-primary);
-    border-left: 2px solid var(--blue);
-    background: var(--bg-selected);
-    font-weight: 500;
-  }
-  .nav-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.55; }
-  .nav-item.active .nav-icon { opacity: 0.9; }
-  .nav-count {
-    margin-left: auto;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 10px;
-    background: var(--bg-raised);
-    color: var(--text-tertiary);
-    border: 1px solid var(--border);
-  }
-  .nav-count.urgent { background: var(--red-dim); color: var(--red); border-color: var(--red-border); }
+/* ── VERTICAL TABS ── */
+.vtabs {
+  width: var(--tab-w);
+  background: var(--bg-1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 2px;
+  flex-shrink: 0;
+  z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.vtabs::-webkit-scrollbar { display: none; }
 
-  /* MAIN CONTENT */
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 290px;
-    overflow: hidden;
-  }
+.vtab {
+  position: relative;
+  width: 36px;
+  min-height: 110px;
+  border-radius: var(--r);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: none;
+  transition: all .15s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.vtab:hover:not(.active) { background: var(--bg-3); border-color: var(--border); }
+.vtab.active { background: var(--bg-3); border-color: var(--border-2); }
+.vtab.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  background: var(--blue);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px var(--blue);
+}
+.vtab.pinned { min-height: 80px; }
+.vtab.pinned.active::before { background: var(--text-3); box-shadow: none; }
 
-  /* QUEUE PANEL */
-  .queue-panel {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border-right: 1px solid var(--border);
-  }
-  .queue-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-surface);
-    flex-shrink: 0;
-  }
-  .queue-title { font-size: 12.5px; font-weight: 500; color: var(--text-primary); }
-  .queue-subtitle { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; font-family: var(--font-mono); }
-  .filter-group { display: flex; gap: 4px; }
-  .filter-btn {
-    font-size: 11px;
-    padding: 3px 9px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: none;
-    cursor: pointer;
-    color: var(--text-secondary);
-    font-family: var(--font);
-    transition: all 0.12s;
-  }
-  .filter-btn:hover { border-color: var(--border-md); color: var(--text-primary); }
-  .filter-btn.active { background: var(--bg-raised); color: var(--text-primary); border-color: var(--border-md); }
+.vtab-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  width: 100%;
+  pointer-events: none;
+}
 
-  .col-header {
-    display: grid;
-    grid-template-columns: 40px 1fr 88px 72px 76px 44px;
-    gap: 10px;
-    padding: 6px 16px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .col-h {
-    font-size: 9px;
-    color: var(--text-tertiary);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-family: var(--font-mono);
-  }
-  .col-h.right { text-align: right; }
-  .col-h.center { text-align: center; }
+.vtab-text {
+  pointer-events: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--text-2);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  max-height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color .15s;
+  line-height: 1;
+}
+.vtab.active .vtab-text { color: var(--text-1); }
 
-  .queue-list { overflow-y: auto; flex: 1; }
-  .queue-list::-webkit-scrollbar { width: 3px; }
-  .queue-list::-webkit-scrollbar-track { background: transparent; }
-  .queue-list::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+.vtab-risk {
+  pointer-events: none;
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  flex-shrink: 0;
+}
+.vr-crit { background: var(--red-glow); color: var(--red); border: 1px solid var(--red-border); }
+.vr-high { background: var(--amber-glow); color: var(--amber); border: 1px solid var(--amber-border); }
+.vr-med  { background: var(--green-glow); color: var(--green); border: 1px solid rgba(79,216,138,.25); }
+.vr-dash { background: var(--bg-4); color: var(--text-3); border: 1px solid var(--border); font-size: 11px; }
 
-  .alert-row {
-    display: grid;
-    grid-template-columns: 40px 1fr 88px 72px 76px 44px;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    background: var(--bg-surface);
-    border-left: 2px solid transparent;
-    transition: background 0.12s;
-  }
-  .alert-row:hover { background: var(--bg-hover); }
-  .alert-row.selected {
-    background: var(--bg-selected);
-    border-left: 2px solid var(--blue);
-  }
+.vtab-close {
+  pointer-events: auto;
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-3);
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0;
+  transition: all .1s;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+.vtab:hover .vtab-close { opacity: 1; color: var(--text-2); }
+.vtab-close:hover { background: var(--red-glow); color: var(--red) !important; }
 
-  .risk-chip {
-    width: 36px; height: 36px;
-    border-radius: var(--radius);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 500;
-    font-family: var(--font-mono);
-  }
-  .risk-crit { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
-  .risk-high { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
-  .risk-med { background: var(--green-dim); color: var(--green); border: 1px solid rgba(82,201,122,0.25); }
+.vtab-add {
+  width: 30px; height: 30px;
+  border-radius: var(--r);
+  border: 1px dashed var(--border-2);
+  background: none;
+  color: var(--text-3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.vtab-add:hover { border-color: var(--blue-border); color: var(--blue); background: var(--blue-glow); }
 
-  .alert-entity { font-size: 12.5px; font-weight: 500; color: var(--text-primary); }
-  .alert-typology { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-  .alert-amount { font-size: 12px; font-weight: 500; text-align: right; font-family: var(--font-mono); color: var(--text-primary); }
-  .alert-sla { font-size: 11px; text-align: center; font-family: var(--font-mono); }
-  .sla-urgent { color: var(--red); font-weight: 500; }
-  .sla-ok { color: var(--text-tertiary); }
+.vtab-divider { width: 24px; height: 1px; background: var(--border); flex-shrink: 0; margin: 4px 0; }
 
-  .status-pill {
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 10px;
-    text-align: center;
-    font-family: var(--font-mono);
-    white-space: nowrap;
-  }
-  .pill-new { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
-  .pill-review { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
-  .pill-escalated { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
-  .pill-closed { background: var(--green-dim); color: var(--green); border: 1px solid rgba(82,201,122,0.25); }
+/* ── CONTENT ── */
+.content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.pane { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.pane.active { display: flex; }
 
-  .assignee {
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 500;
-    font-family: var(--font-mono);
-    margin: auto;
-  }
-  .a-blue { background: rgba(75,156,245,0.15); color: var(--blue); border: 1px solid var(--blue-border); }
-  .a-purple { background: rgba(138,99,210,0.15); color: #8a63d2; border: 1px solid rgba(138,99,210,0.3); }
-  .a-teal { background: rgba(52,190,180,0.15); color: #34beb4; border: 1px solid rgba(52,190,180,0.3); }
-  .a-none { background: var(--bg-raised); color: var(--text-tertiary); border: 1px dashed var(--border-md); }
+/* ════════════════════════════════════
+   DASHBOARD PANE
+════════════════════════════════════ */
+.dash-pane { display: flex; flex-direction: column; overflow: hidden; }
 
-  /* DETAIL PANEL */
-  .detail-panel {
-    background: var(--bg-surface);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .detail-scroll { overflow-y: auto; flex: 1; }
-  .detail-scroll::-webkit-scrollbar { width: 3px; }
-  .detail-scroll::-webkit-scrollbar-track { background: transparent; }
-  .detail-scroll::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+.metrics-row {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.metric { padding: 11px 18px; border-right: 1px solid var(--border); }
+.metric:last-child { border-right: none; }
+.m-label { font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+.m-val { font-size: 22px; font-weight: 600; color: var(--text-1); line-height: 1; }
+.m-val.red { color: var(--red); }
+.m-delta { font-family: var(--mono); font-size: 10px; margin-top: 3px; }
+.du { color: var(--red); } .dd { color: var(--green); } .df { color: var(--text-3); }
+.rbar { height: 2px; background: var(--bg-4); border-radius: 1px; margin-top: 5px; }
+.rbar-fill { height: 2px; border-radius: 1px; background: var(--red); }
 
-  .detail-header {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .detail-case-id {
-    font-size: 9px;
-    font-family: var(--font-mono);
-    color: var(--text-tertiary);
-    letter-spacing: 0.08em;
-    margin-bottom: 5px;
-  }
-  .detail-name { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
-  .detail-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-  .tag {
-    font-size: 10px;
-    font-family: var(--font-mono);
-    padding: 2px 7px;
-    border-radius: 4px;
-  }
-  .tag-red { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
-  .tag-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
-  .tag-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
-  .tag-gray { background: var(--bg-raised); color: var(--text-secondary); border: 1px solid var(--border-md); }
+.dash-body { display: grid; grid-template-columns: 200px 1fr; flex: 1; overflow: hidden; }
+.nav-col { background: var(--bg-1); border-right: 1px solid var(--border); overflow-y: auto; padding: 10px 0; }
+.nav-col::-webkit-scrollbar { width: 2px; }
+.nav-col::-webkit-scrollbar-thumb { background: var(--border-2); }
+.nav-s { padding: 9px 14px 3px; font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; }
+.nav-i { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-size: 12px; color: var(--text-2); cursor: pointer; border-left: 2px solid transparent; transition: all .12s; }
+.nav-i:hover:not(.on) { background: var(--bg-3); color: var(--text-1); }
+.nav-i.on { background: var(--bg-3); border-left: 2px solid var(--blue); color: var(--text-1); font-weight: 500; }
+.nav-ic { width: 13px; height: 13px; opacity: .5; flex-shrink: 0; }
+.nav-i.on .nav-ic { opacity: .9; }
+.nav-ct { margin-left: auto; font-family: var(--mono); font-size: 9.5px; padding: 1px 5px; border-radius: 8px; background: var(--bg-4); color: var(--text-3); border: 1px solid var(--border); }
+.nav-ct.urg { background: var(--red-glow); color: var(--red); border-color: var(--red-border); }
 
-  .detail-section {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .detail-section-title {
-    font-size: 9px;
-    font-family: var(--font-mono);
-    font-weight: 500;
-    color: var(--text-tertiary);
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    margin-bottom: 9px;
-  }
-  .kv-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 3.5px 0;
-  }
-  .kv-key { font-size: 11.5px; color: var(--text-secondary); }
-  .kv-val { font-size: 11.5px; font-weight: 500; color: var(--text-primary); font-family: var(--font-mono); }
-  .kv-val.red { color: var(--red); }
-  .kv-val.amber { color: var(--amber); }
+/* Queue */
+.queue-wrap { display: flex; flex-direction: column; overflow: hidden; }
+.queue-hdr { display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; background: var(--bg-1); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.queue-hdr-l .qt { font-size: 12.5px; font-weight: 500; }
+.queue-hdr-l .qs { font-family: var(--mono); font-size: 10px; color: var(--text-3); margin-top: 1px; }
+.flt-row { display: flex; gap: 4px; }
+.flt { font-size: 11px; padding: 3px 9px; border: 1px solid var(--border); border-radius: var(--r); background: none; color: var(--text-2); cursor: pointer; font-family: var(--font); transition: all .12s; }
+.flt:hover { border-color: var(--border-2); color: var(--text-1); }
+.flt.on { background: var(--bg-3); color: var(--text-1); border-color: var(--border-2); }
 
-  .txn-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .txn-item:last-child { border-bottom: none; }
-  .txn-desc { font-size: 11.5px; color: var(--text-primary); }
-  .txn-meta { font-size: 10px; color: var(--text-tertiary); font-family: var(--font-mono); margin-top: 2px; }
-  .txn-amount { font-size: 12px; font-weight: 500; font-family: var(--font-mono); white-space: nowrap; }
-  .txn-in { color: var(--green); }
-  .txn-out { color: var(--red); }
+.col-hdr { display: grid; grid-template-columns: 38px 1fr 90px 70px 78px 40px; gap: 10px; padding: 5px 16px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.ch { font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: .08em; text-transform: uppercase; }
+.ch.r { text-align: right; } .ch.c { text-align: center; }
 
-  .sparkline-wrap { margin-top: 10px; }
-  .spark-label { font-size: 9px; color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 5px; }
-  .sparkline { display: flex; align-items: flex-end; gap: 2px; height: 32px; }
-  .spark-bar { flex: 1; border-radius: 1px 1px 0 0; background: rgba(75,156,245,0.25); transition: background 0.15s; }
-  .spark-bar.hi { background: rgba(245,91,91,0.5); }
-  .spark-bar:hover { background: var(--blue); }
-  .spark-bar.hi:hover { background: var(--red); }
+.queue-list { overflow-y: auto; flex: 1; }
+.queue-list::-webkit-scrollbar { width: 3px; }
+.queue-list::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
 
-  /* ACTIONS */
-  .action-section { padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
-  .action-btn {
-    font-size: 12px;
-    padding: 8px 12px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border-md);
-    background: var(--bg-raised);
-    cursor: pointer;
-    color: var(--text-secondary);
-    text-align: left;
-    font-family: var(--font);
-    transition: all 0.12s;
-    line-height: 1.4;
-  }
-  .action-btn:hover { border-color: var(--border-strong); color: var(--text-primary); background: var(--bg-hover); }
-  .action-btn.primary {
-    background: rgba(75,156,245,0.12);
-    border-color: var(--blue-border);
-    color: var(--blue);
-    font-weight: 500;
-  }
-  .action-btn.primary:hover { background: rgba(75,156,245,0.2); border-color: var(--blue); }
+.arow {
+  display: grid; grid-template-columns: 38px 1fr 90px 70px 78px 40px;
+  align-items: center; gap: 10px; padding: 9px 16px;
+  border-bottom: 1px solid var(--border); cursor: pointer;
+  background: var(--bg-1); border-left: 2px solid transparent;
+  transition: background .1s;
+  user-select: none;
+}
+.arow:hover { background: var(--bg-3); }
+.arow.sel { background: rgba(91,163,245,0.05); border-left: 2px solid var(--blue); }
 
-  /* AUDIT LOG in detail */
-  .audit-item {
-    display: flex;
-    gap: 9px;
-    padding: 5px 0;
-    align-items: flex-start;
-  }
-  .audit-time { font-size: 10px; color: var(--text-tertiary); font-family: var(--font-mono); white-space: nowrap; margin-top: 1px; }
-  .audit-text { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
-  .audit-who { color: var(--blue); }
+.rchip { width: 34px; height: 34px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 500; }
+.rc-c { background: var(--red-glow); color: var(--red); border: 1px solid var(--red-border); }
+.rc-h { background: var(--amber-glow); color: var(--amber); border: 1px solid var(--amber-border); }
+.rc-m { background: var(--green-glow); color: var(--green); border: 1px solid rgba(79,216,138,.25); }
 
-  /* SCROLLBAR for queue */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+.ae { font-size: 12.5px; font-weight: 500; }
+.at { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+.amt { font-family: var(--mono); font-size: 12px; text-align: right; }
+.asla { font-family: var(--mono); font-size: 11px; text-align: center; }
+.su { color: var(--red); font-weight: 500; } .so { color: var(--text-3); }
 
-  /* EMPTY state */
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    height: 100%; color: var(--text-tertiary); gap: 8px; padding: 40px;
-    text-align: center;
-  }
-  .empty-icon { font-size: 28px; opacity: 0.3; }
-  .empty-text { font-size: 13px; }
+.spill { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 10px; text-align: center; white-space: nowrap; }
+.sp-new { background: var(--blue-glow); color: var(--blue); border: 1px solid var(--blue-border); }
+.sp-rev { background: var(--amber-glow); color: var(--amber); border: 1px solid var(--amber-border); }
+.sp-esc { background: var(--red-glow); color: var(--red); border: 1px solid var(--red-border); }
 
-  /* Notification dot */
-  .notif-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--red);
-    box-shadow: 0 0 6px var(--red);
-    flex-shrink: 0;
-  }
+.asn { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; font-weight: 500; margin: auto; }
+.as-b { background: rgba(91,163,245,.15); color: var(--blue); border: 1px solid var(--blue-border); }
+.as-p { background: rgba(150,100,220,.15); color: #9664dc; border: 1px solid rgba(150,100,220,.3); }
+.as-t { background: rgba(50,195,180,.15); color: #32c3b4; border: 1px solid rgba(50,195,180,.3); }
+.as-n { background: var(--bg-4); color: var(--text-3); border: 1px dashed var(--border-2); }
+
+.hint { text-align: center; padding: 18px; font-size: 11px; color: var(--text-3); font-family: var(--mono); border-bottom: 1px solid var(--border); }
+
+/* ════════════════════════════════════
+   CASE PANE
+════════════════════════════════════ */
+.case-pane { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+
+.case-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; background: var(--bg-1);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.case-topbar-l { display: flex; flex-direction: column; gap: 3px; }
+.case-id { font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: .1em; }
+.case-title { font-size: 16px; font-weight: 600; }
+.case-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+.tag { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+.tg-r { background: var(--red-glow); color: var(--red); border: 1px solid var(--red-border); }
+.tg-a { background: var(--amber-glow); color: var(--amber); border: 1px solid var(--amber-border); }
+.tg-b { background: var(--blue-glow); color: var(--blue); border: 1px solid var(--blue-border); }
+.tg-g { background: var(--bg-3); color: var(--text-2); border: 1px solid var(--border-2); }
+
+.case-topbar-r { display: flex; align-items: center; gap: 8px; }
+.cbtn { font-size: 12px; padding: 7px 14px; border-radius: var(--r); border: 1px solid var(--border-2); background: var(--bg-3); color: var(--text-2); cursor: pointer; font-family: var(--font); transition: all .12s; }
+.cbtn:hover { border-color: var(--border-3); color: var(--text-1); }
+.cbtn.primary { background: var(--blue-glow); border-color: var(--blue-border); color: var(--blue); font-weight: 500; }
+.cbtn.primary:hover { background: rgba(91,163,245,.22); }
+.cbtn.danger { background: var(--red-glow); border-color: var(--red-border); color: var(--red); }
+
+/* Sub-tabs inside case */
+.case-subtabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--bg-1); flex-shrink: 0; }
+.cst { font-size: 11.5px; padding: 8px 16px; border-bottom: 2px solid transparent; color: var(--text-2); cursor: pointer; font-family: var(--font); transition: all .12s; border-top: none; border-left: none; border-right: none; background: none; }
+.cst:hover { color: var(--text-1); }
+.cst.on { color: var(--text-1); border-bottom: 2px solid var(--blue); }
+
+.case-body { flex: 1; overflow: hidden; display: flex; }
+.sub-pane { display: none; flex: 1; overflow: hidden; }
+.sub-pane.on { display: flex; }
+
+/* Overview layout */
+.ov-layout { display: grid; grid-template-columns: 280px 1fr 260px; gap: 0; width: 100%; overflow: hidden; }
+.ov-col { overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; border-right: 1px solid var(--border); }
+.ov-col:last-child { border-right: none; }
+.ov-col::-webkit-scrollbar { width: 3px; }
+.ov-col::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+.card { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px; }
+.card-title { font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+.kv { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; }
+.kk { font-size: 11.5px; color: var(--text-2); }
+.kv-v { font-size: 11.5px; font-weight: 500; font-family: var(--mono); }
+.kv-v.red { color: var(--red); }
+.kv-v.amb { color: var(--amber); }
+
+/* Sparkline */
+.sparkwrap { margin-top: 10px; }
+.spark-lbl { font-family: var(--mono); font-size: 9px; color: var(--text-3); margin-bottom: 5px; }
+.sparkline { display: flex; align-items: flex-end; gap: 2px; height: 36px; }
+.sb { flex: 1; border-radius: 1px 1px 0 0; background: rgba(91,163,245,.2); transition: background .15s; }
+.sb:hover { background: var(--blue); }
+.sb.hi { background: rgba(245,96,96,.4); }
+.sb.hi:hover { background: var(--red); }
+
+/* Txn list */
+.txn { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.txn:last-child { border-bottom: none; }
+.txn-d { font-size: 11.5px; }
+.txn-m { font-family: var(--mono); font-size: 10px; color: var(--text-3); margin-top: 2px; }
+.txn-a { font-family: var(--mono); font-size: 12px; font-weight: 500; }
+.ti { color: var(--green); } .to { color: var(--red); }
+
+/* Patterns / Insights */
+.insight { border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; display: flex; gap: 10px; background: var(--bg); }
+.ins-sev { width: 4px; border-radius: 2px; flex-shrink: 0; }
+.sev-c { background: var(--red); } .sev-h { background: var(--amber); } .sev-m { background: var(--green); }
+.ins-body {}
+.ins-head { font-size: 12px; font-weight: 500; margin-bottom: 3px; }
+.ins-text { font-size: 11px; color: var(--text-2); line-height: 1.5; }
+.ins-ev { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+.ev-pill { font-family: var(--mono); font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: var(--bg-3); color: var(--text-2); border: 1px solid var(--border); }
+
+/* Audit */
+.audit-i { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.audit-i:last-child { border-bottom: none; }
+.audit-t { font-family: var(--mono); font-size: 10px; color: var(--text-3); white-space: nowrap; margin-top: 1px; }
+.audit-txt { font-size: 11.5px; color: var(--text-2); line-height: 1.5; }
+.audit-who { color: var(--blue); }
+
+/* Actions col */
+.act-btn { width: 100%; font-size: 12px; padding: 9px 12px; border-radius: var(--r); border: 1px solid var(--border-2); background: var(--bg-3); cursor: pointer; color: var(--text-2); text-align: left; font-family: var(--font); transition: all .12s; line-height: 1.4; }
+.act-btn:hover { border-color: var(--border-3); color: var(--text-1); background: var(--bg-4); }
+.act-btn.p { background: var(--blue-glow); border-color: var(--blue-border); color: var(--blue); font-weight: 500; }
+.act-btn.p:hover { background: rgba(91,163,245,.22); }
+.act-note { font-size: 10px; opacity: .6; margin-top: 2px; font-family: var(--mono); }
+
+/* empty state */
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; color: var(--text-3); }
+.empty-icon { font-size: 24px; opacity: .3; }
+.empty-txt { font-size: 12px; font-family: var(--mono); }
+
+/* Network placeholder */
+.net-pane { flex: 1; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+.net-svg { opacity: .7; }
+.net-note { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+
+/* SAR pane */
+.sar-pane { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; max-width: 760px; }
+.sar-pane::-webkit-scrollbar { width: 3px; }
+.sar-pane::-webkit-scrollbar-thumb { background: var(--border-2); }
+.sar-label { font-family: var(--mono); font-size: 9px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+.sar-input { width: 100%; background: var(--bg-1); border: 1px solid var(--border-2); border-radius: var(--r); padding: 9px 12px; font-size: 12.5px; color: var(--text-1); font-family: var(--font); outline: none; transition: border-color .12s; }
+.sar-input:focus { border-color: var(--blue-border); }
+.sar-textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+.sar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 </style>
 </head>
 <body>
-
-<div class="layout">
+<div class="shell">
 
   <!-- TOPBAR -->
   <header class="topbar">
-    <div class="topbar-left">
-      <div class="logo">
-        <div class="logo-dot"></div>
-        SENTINEL
-        <span class="logo-sub">/ AML &amp; Fraud Investigations</span>
-      </div>
-      <div class="tabs">
-        <button class="tab active">Investigations</button>
-        <button class="tab">Analytics</button>
-        <button class="tab">Rules Engine</button>
-        <button class="tab">Reporting</button>
-        <button class="tab">Settings</button>
-      </div>
+    <div class="logo">
+      <div class="logo-pip"></div>
+      SENTINEL
+      <span class="logo-sep">/</span>
+      <span style="color:var(--text-2);font-weight:300;letter-spacing:.06em">AML &amp; FRAUD</span>
+    </div>
+    <div class="topbar-center">
+      <button class="t-tab on">Investigations</button>
+      <button class="t-tab">Analytics</button>
+      <button class="t-tab">Rules Engine</button>
+      <button class="t-tab">Reporting</button>
     </div>
     <div class="topbar-right">
-      <div class="sla-badge">⚠ 12 SLA breaching</div>
-      <div class="user-chip">
-        <span class="user-name">Sarah Kim · Analyst II</span>
-        <div class="avatar">SK</div>
+      <div class="sla-pill">⚑ 12 SLA breaching</div>
+      <div class="usr">
+        <span class="usr-name">Sarah Kim · Analyst II</span>
+        <div class="avi">SK</div>
       </div>
     </div>
   </header>
 
-  <!-- METRICS ROW -->
-  <div class="metrics-bar">
-    <div class="metric">
-      <div class="metric-label">Open alerts</div>
-      <div class="metric-row">
-        <div class="metric-value">341</div>
-        <div class="metric-delta delta-up">↑18</div>
-      </div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Avg risk score</div>
-      <div class="metric-row">
-        <div class="metric-value">74</div>
-        <div class="metric-delta delta-up">↑6 pts</div>
-      </div>
-      <div class="risk-bar-wrap"><div class="risk-bar-fill" style="width:74%"></div></div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">SLA breaching</div>
-      <div class="metric-row">
-        <div class="metric-value red">12</div>
-        <div class="metric-delta delta-up">↑4 today</div>
-      </div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Closed today</div>
-      <div class="metric-row">
-        <div class="metric-value">47</div>
-        <div class="metric-delta delta-down">↓3 vs avg</div>
-      </div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">SAR filed MTD</div>
-      <div class="metric-row">
-        <div class="metric-value">9</div>
-        <div class="metric-delta delta-flat">→ on target</div>
-      </div>
-    </div>
-  </div>
+  <div class="body-row">
 
-  <!-- SIDEBAR -->
-  <nav class="sidebar">
-    <div class="nav-section">Queue</div>
-    <div class="nav-item active" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="3" rx="1" fill="currentColor" opacity=".8"/><rect x="1" y="6" width="14" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="11" width="9" height="3" rx="1" fill="currentColor" opacity=".3"/></svg>
-      My queue
-      <span class="nav-count urgent">24</span>
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      SLA urgent
-      <span class="nav-count urgent">12</span>
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M2 4h12M2 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      All alerts
-      <span class="nav-count">341</span>
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      Escalated
-      <span class="nav-count urgent">7</span>
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12L8 4l6 8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-      Closed
-      <span class="nav-count">189</span>
-    </div>
-
-    <div class="nav-section" style="margin-top:6px;">Workflows</div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M4 4h8M4 8h5M4 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      SAR drafts
-      <span class="nav-count">3</span>
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="11" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="11" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7l2-2M7 9l2 2" stroke="currentColor" stroke-width="1.5"/></svg>
-      Network links
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="9" width="12" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M8 2v7M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Evidence vault
-    </div>
-
-    <div class="nav-section" style="margin-top:6px;">Analytics</div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 13l3-4 3 2 3-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Performance
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="1" width="10" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 5h4M6 8h4M6 11h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      Audit log
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v4M8 5.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      False positive report
-    </div>
-  </nav>
-
-  <!-- MAIN CONTENT -->
-  <div class="main">
-
-    <!-- QUEUE PANEL -->
-    <div class="queue-panel">
-      <div class="queue-header">
-        <div>
-          <div class="queue-title">Alert queue</div>
-          <div class="queue-subtitle">24 assigned · 12 SLA breaching</div>
-        </div>
-        <div class="filter-group">
-          <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
-          <button class="filter-btn" onclick="setFilter(this,'critical')">Critical ≥90</button>
-          <button class="filter-btn" onclick="setFilter(this,'sla')">SLA ↑</button>
-          <button class="filter-btn" onclick="setFilter(this,'unassigned')">Unassigned</button>
+    <!-- VERTICAL TABS -->
+    <div class="vtabs" id="vtabs">
+      <!-- Dashboard tab (pinned) -->
+      <div class="vtab pinned active" data-pane="dash">
+        <div class="vtab-inner">
+          <div class="vtab-risk vr-dash">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="2.5" rx=".8" fill="currentColor" opacity=".8"/><rect x="1" y="4.75" width="10" height="2.5" rx=".8" fill="currentColor" opacity=".5"/><rect x="1" y="8.5" width="6.5" height="2.5" rx=".8" fill="currentColor" opacity=".3"/></svg>
+          </div>
+          <div class="vtab-text">DASHBOARD</div>
         </div>
       </div>
-      <div class="col-header">
-        <div class="col-h">Risk</div>
-        <div class="col-h">Entity / typology</div>
-        <div class="col-h right">Amount</div>
-        <div class="col-h center">SLA</div>
-        <div class="col-h center">Status</div>
-        <div class="col-h center">Owner</div>
-      </div>
-      <div class="queue-list" id="queue-list"></div>
+      <div class="vtab-divider"></div>
+      <!-- Case tabs injected here by JS -->
+      <div id="case-tabs-slot"></div>
+      <button class="vtab-add" title="Open case" onclick="alert('Double-click a row in the queue to open a case')">+</button>
     </div>
 
-    <!-- DETAIL PANEL -->
-    <div class="detail-panel">
-      <div class="detail-scroll" id="detail-panel">
-        <div class="empty-state">
-          <div class="empty-icon">↖</div>
-          <div class="empty-text">Select an alert to investigate</div>
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ── DASHBOARD PANE ── -->
+      <div class="pane active dash-pane" id="pane-dash">
+        <!-- Metrics -->
+        <div class="metrics-row">
+          <div class="metric">
+            <div class="m-label">Open alerts</div>
+            <div class="m-val">341</div>
+            <div class="m-delta du">↑ 18 from yesterday</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">Avg risk score</div>
+            <div class="m-val">74</div>
+            <div class="m-delta du">↑ 6 pts</div>
+            <div class="rbar"><div class="rbar-fill" style="width:74%"></div></div>
+          </div>
+          <div class="metric">
+            <div class="m-label">SLA breaching</div>
+            <div class="m-val red">12</div>
+            <div class="m-delta du">↑ 4 today</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">Closed today</div>
+            <div class="m-val">47</div>
+            <div class="m-delta dd">↓ 3 vs avg</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">SAR filed MTD</div>
+            <div class="m-val">9</div>
+            <div class="m-delta df">→ on target</div>
+          </div>
+        </div>
+
+        <div class="dash-body">
+          <!-- Sidebar nav -->
+          <div class="nav-col">
+            <div class="nav-s">Queue</div>
+            <div class="nav-i on" onclick="setNav(this,'all')">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="2.5" rx=".7" fill="currentColor" opacity=".8"/><rect x="1" y="5.25" width="11" height="2.5" rx=".7" fill="currentColor" opacity=".5"/><rect x="1" y="9.5" width="7" height="2.5" rx=".7" fill="currentColor" opacity=".3"/></svg>
+              My queue <span class="nav-ct urg">24</span>
+            </div>
+            <div class="nav-i" onclick="setNav(this,'sla')">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              SLA urgent <span class="nav-ct urg">12</span>
+            </div>
+            <div class="nav-i" onclick="setNav(this,'all')">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M2 3.5h9M2 9.5h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              All alerts <span class="nav-ct">341</span>
+            </div>
+            <div class="nav-i" onclick="setNav(this,'escalated')">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Escalated <span class="nav-ct urg">7</span>
+            </div>
+            <div class="nav-i" onclick="setNav(this,'all')">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><path d="M2 10L6.5 4l4.5 6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              Closed <span class="nav-ct">189</span>
+            </div>
+            <div class="nav-s" style="margin-top:6px">Workflows</div>
+            <div class="nav-i">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><path d="M3 3h7M3 6h5M3 9h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              SAR drafts <span class="nav-ct">3</span>
+            </div>
+            <div class="nav-i">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><circle cx="4" cy="6.5" r="1.6" stroke="currentColor" stroke-width="1.3"/><circle cx="9" cy="3.5" r="1.6" stroke="currentColor" stroke-width="1.3"/><circle cx="9" cy="9.5" r="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M5.6 5.9L7.4 4.1M5.6 7.1L7.4 8.9" stroke="currentColor" stroke-width="1.3"/></svg>
+              Network links
+            </div>
+            <div class="nav-s" style="margin-top:6px">Reports</div>
+            <div class="nav-i">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><path d="M2 10.5l2.5-3.5 2.5 2 2.5-4.5 2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Performance
+            </div>
+            <div class="nav-i">
+              <svg class="nav-ic" viewBox="0 0 13 13" fill="none"><rect x="2.5" y="1" width="8" height="11" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M5 4h3M5 6.5h3M5 9h1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Audit log
+            </div>
+          </div>
+
+          <!-- Queue -->
+          <div class="queue-wrap">
+            <div class="queue-hdr">
+              <div class="queue-hdr-l">
+                <div class="qt">Alert queue</div>
+                <div class="qs">24 assigned · 12 SLA breaching · double-click to investigate</div>
+              </div>
+              <div class="flt-row">
+                <button class="flt on" onclick="setFilter(this,'all')">All</button>
+                <button class="flt" onclick="setFilter(this,'critical')">Critical ≥90</button>
+                <button class="flt" onclick="setFilter(this,'sla')">SLA ↑</button>
+                <button class="flt" onclick="setFilter(this,'unassigned')">Unassigned</button>
+              </div>
+            </div>
+            <div class="col-hdr">
+              <div class="ch">Risk</div>
+              <div class="ch">Entity / typology</div>
+              <div class="ch r">Amount</div>
+              <div class="ch c">SLA</div>
+              <div class="ch c">Status</div>
+              <div class="ch c">Owner</div>
+            </div>
+            <div class="hint">↑ Single-click to preview · Double-click to open full investigation tab</div>
+            <div class="queue-list" id="queue-list"></div>
+          </div>
         </div>
       </div>
-    </div>
+      <!-- Case panes injected by JS -->
+      <div id="case-panes-slot"></div>
 
-  </div>
-</div>
+    </div><!-- /content -->
+  </div><!-- /body-row -->
+</div><!-- /shell -->
 
 <script>
+// ─────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────
 const ALERTS = [
   {
-    id:'CASE-2024-08471', status:'AML / ESCALATED', risk:94, riskClass:'risk-crit',
+    id:'CASE-2024-08471', risk:94, rChip:'rc-c', vRisk:'vr-crit',
     entity:'Meridian Trade LLC', typology:'Structuring / layering — wire series',
-    amount:'$487,200', sla:'2h 14m', slaClass:'sla-urgent',
-    statusLabel:'Escalated', statusClass:'pill-escalated',
-    owner:'SK', ownerClass:'a-blue', filter:['all','critical','sla'],
-    tags:['Risk 94','SLA 2h 14m','Structuring','Wire series','Corp account'],
-    tagClasses:['tag-red','tag-red','tag-amber','tag-blue','tag-gray'],
-    profile:[
-      ['Entity type','LLC — import/export',''],
-      ['Opened','Mar 2019',''],
-      ['Prior SARs','2 filed','red'],
-      ['Risk tier','High',''],
-      ['Jurisdiction','DE (UBO: Panama)','amber']
-    ],
-    summary:[
-      ['Total flagged','$487,200',''],
-      ['Txn count','9 wires (6 days)',''],
-      ['Rule triggered','WIRE-STRUCT-004',''],
-      ['Counterparty','3 new entities','amber']
-    ],
+    amount:'$487,200', sla:'2h 14m', slaC:'su', statusL:'Escalated', statusC:'sp-esc',
+    owner:'SK', ownerC:'as-b', filter:['all','critical','sla'],
+    status:'AML / ESCALATED',
+    tags:[['Risk 94','tg-r'],['SLA 2h 14m','tg-r'],['Structuring','tg-a'],['Wire series','tg-b'],['Corp account','tg-g']],
+    profile:[['Entity type','LLC — import/export',''],['Opened','Mar 2019',''],['Prior SARs','2 filed','red'],['Risk tier','High',''],['Jurisdiction','DE (UBO: Panama)','amb']],
+    summary:[['Total flagged','$487,200',''],['Txn count','9 wires (6 days)',''],['Rule triggered','WIRE-STRUCT-004',''],['Counterparty','3 new entities','amb']],
     spark:[30,45,55,80,95,100,90], sparkHi:[3,4,5,6],
     txns:[
       {d:'Wire to Orion Capital SA',m:'Apr 28 · BIC: BCEFPAPA',a:'−$98,500',out:true},
       {d:'Wire to Orion Capital SA',m:'Apr 27 · BIC: BCEFPAPA',a:'−$97,000',out:true},
       {d:'Inbound — Coastal Metals Inc',m:'Apr 27 · ACH',a:'+$199,400',out:false},
-      {d:'Wire to Apex Trade BV',m:'Apr 26 · BIC: INGBNL2A',a:'−$88,200',out:true}
+      {d:'Wire to Apex Trade BV',m:'Apr 26 · BIC: INGBNL2A',a:'−$88,200',out:true},
+      {d:'Wire to Orion Capital SA',m:'Apr 25 · BIC: BCEFPAPA',a:'−$94,000',out:true},
+    ],
+    insights:[
+      {sev:'c',head:'Structuring detected',text:'9 wire transfers over 6 days, each between $88k–$99k. Pattern consistent with deliberate sub-threshold structuring to avoid CTR reporting (threshold: $10k individual; $100k aggregate flag).',ev:['9 wires','$88k–$99k each','6-day window']},
+      {sev:'c',head:'Repeated beneficiary + new counterparties',text:'Orion Capital SA received 3 wires totalling $289,500. Two additional new counterparties (Apex Trade BV, unknown Panama entity) appeared within the same window.',ev:['3 wires → Orion','2 new beneficiaries','BIC: Panama']},
+      {sev:'h',head:'Rapid in-out velocity',text:'Inbound $199,400 on Apr 27 followed by $97,000 outbound same day. Net near-zero balance maintained across the 6-day window suggests pass-through activity.',ev:['Same-day out','Near-zero net','Apr 27']},
     ],
     audit:[
-      {t:'14:22','txt':'Escalated by <span class="audit-who">MR</span> — pattern matches FATF typology 8'},
-      {t:'11:05','txt':'Review opened by <span class="audit-who">SK</span>'},
-      {t:'09:30','txt':'Alert generated by WIRE-STRUCT-004'}
+      {t:'14:22',txt:'Escalated by <span class="audit-who">MR</span> — pattern matches FATF typology 8'},
+      {t:'11:05',txt:'Review opened by <span class="audit-who">SK</span>'},
+      {t:'09:30',txt:'Alert generated by rule WIRE-STRUCT-004'},
     ],
     actions:[
-      {l:'Draft SAR narrative →', primary:true, note:'File within 2h 14m'},
-      {l:'View network links →', primary:false},
-      {l:'Disposition guidance →', primary:false}
+      {l:'Draft SAR narrative',note:'File deadline in 2h 14m',p:true},
+      {l:'View network graph →',p:false},
+      {l:'Request transaction docs →',p:false},
+      {l:'Escalate to senior analyst →',p:false},
     ]
   },
   {
-    id:'CASE-2024-08445', status:'AML / IN REVIEW', risk:91, riskClass:'risk-crit',
+    id:'CASE-2024-08445', risk:91, rChip:'rc-c', vRisk:'vr-crit',
     entity:'Alicia Vargova', typology:'Rapid fund movement — same-day out',
-    amount:'$212,000', sla:'4h 01m', slaClass:'sla-urgent',
-    statusLabel:'In review', statusClass:'pill-review',
-    owner:'SK', ownerClass:'a-blue', filter:['all','critical','sla'],
-    tags:['Risk 91','SLA 4h 01m','Rapid movement','Same-day out'],
-    tagClasses:['tag-red','tag-red','tag-amber','tag-blue'],
-    profile:[
-      ['Customer type','Individual — retail',''],
-      ['Opened','Jan 2022',''],
-      ['Prior SARs','None',''],
-      ['Risk tier','Medium',''],
-      ['Jurisdiction','NY, USA','']
-    ],
-    summary:[
-      ['Total flagged','$212,000',''],
-      ['Txn count','4 transfers (1 day)',''],
-      ['Rule triggered','VEL-SAME-DAY-002',''],
-      ['Pattern','In $200k → out $212k / 6h','amber']
-    ],
+    amount:'$212,000', sla:'4h 01m', slaC:'su', statusL:'In review', statusC:'sp-rev',
+    owner:'SK', ownerC:'as-b', filter:['all','critical','sla'],
+    status:'AML / IN REVIEW',
+    tags:[['Risk 91','tg-r'],['SLA 4h 01m','tg-r'],['Rapid movement','tg-a'],['Same-day out','tg-b']],
+    profile:[['Customer type','Individual — retail',''],['Opened','Jan 2022',''],['Prior SARs','None',''],['Risk tier','Medium',''],['Jurisdiction','NY, USA','']],
+    summary:[['Total flagged','$212,000',''],['Txn count','4 transfers (1 day)',''],['Rule triggered','VEL-SAME-DAY-002',''],['Pattern','In $200k → out $212k / 6h','amb']],
     spark:[5,5,10,8,12,100,90], sparkHi:[5,6],
     txns:[
       {d:'Inbound wire — Unknown Corp',m:'Apr 29 · Wire',a:'+$212,000',out:false},
       {d:'Zelle to Marcus Webb',m:'Apr 29 · Zelle',a:'−$70,000',out:true},
       {d:'Wire to Belize account',m:'Apr 29 · SWIFT',a:'−$80,000',out:true},
-      {d:'Crypto exchange withdrawal',m:'Apr 29 · Coinbase',a:'−$62,000',out:true}
+      {d:'Crypto exchange withdrawal',m:'Apr 29 · Coinbase',a:'−$62,000',out:true},
+    ],
+    insights:[
+      {sev:'c',head:'Same-day layering across three channels',text:'$212,000 received at 08:14, fully dispersed by 14:32 via three separate rails (Zelle, SWIFT, crypto). Classic 3-channel layering to obscure trail.',ev:['6h window','3 channels','Zelle+SWIFT+crypto']},
+      {sev:'h',head:'High-risk destination — Belize',text:'$80,000 wired to Belize account. Belize is on FATF grey list (enhanced monitoring required). Beneficiary account opened <30 days ago.',ev:['FATF grey list','Account age <30d']},
     ],
     audit:[
-      {t:'13:44','txt':'Assigned to <span class="audit-who">SK</span>'},
-      {t:'13:41','txt':'Alert generated by VEL-SAME-DAY-002'}
+      {t:'13:44',txt:'Assigned to <span class="audit-who">SK</span>'},
+      {t:'13:41',txt:'Alert generated by VEL-SAME-DAY-002'},
     ],
     actions:[
-      {l:'Draft SAR narrative →', primary:true, note:'File within 4h 01m'},
-      {l:'Check prior cases →', primary:false},
-      {l:'Disposition guidance →', primary:false}
+      {l:'Draft SAR narrative',note:'File deadline in 4h 01m',p:true},
+      {l:'Check prior cases →',p:false},
+      {l:'Disposition guidance →',p:false},
     ]
   },
   {
-    id:'CASE-2024-08390', status:'AML / IN REVIEW', risk:78, riskClass:'risk-high',
+    id:'CASE-2024-08390', risk:78, rChip:'rc-h', vRisk:'vr-high',
     entity:'Dalton & Sons Import', typology:'Trade-based ML — invoice mismatch',
-    amount:'$1,024,500', sla:'11h 30m', slaClass:'sla-ok',
-    statusLabel:'In review', statusClass:'pill-review',
-    owner:'MR', ownerClass:'a-purple', filter:['all'],
-    tags:['Risk 78','Trade-based ML','Invoice mismatch','Corp account'],
-    tagClasses:['tag-amber','tag-amber','tag-blue','tag-gray'],
-    profile:[
-      ['Entity type','LLC — commodities',''],
-      ['Opened','Nov 2017',''],
-      ['Prior SARs','1 filed','red'],
-      ['Risk tier','High',''],
-      ['Jurisdiction','TX (Trade: China, UAE)','amber']
-    ],
-    summary:[
-      ['Total flagged','$1,024,500',''],
-      ['Txn count','12 trade payments (30d)',''],
-      ['Rule triggered','TBML-INVOICE-007',''],
-      ['Anomaly','Invoice values 40% above market','amber']
-    ],
+    amount:'$1,024,500', sla:'11h 30m', slaC:'so', statusL:'In review', statusC:'sp-rev',
+    owner:'MR', ownerC:'as-p', filter:['all'],
+    status:'AML / IN REVIEW',
+    tags:[['Risk 78','tg-a'],['Trade-based ML','tg-a'],['Invoice mismatch','tg-b'],['Corp account','tg-g']],
+    profile:[['Entity type','LLC — commodities',''],['Opened','Nov 2017',''],['Prior SARs','1 filed','red'],['Risk tier','High',''],['Jurisdiction','TX (Trade: China, UAE)','amb']],
+    summary:[['Total flagged','$1,024,500',''],['Txn count','12 trade payments (30d)',''],['Rule triggered','TBML-INVOICE-007',''],['Anomaly','Invoice values 40% above market','amb']],
     spark:[40,55,50,60,65,70,80], sparkHi:[6],
     txns:[
       {d:'Payment to Shenzhen Metals Co',m:'Apr 25 · SWIFT',a:'−$290,000',out:true},
       {d:'Payment to Gulf Trade LLC',m:'Apr 20 · SWIFT',a:'−$188,500',out:true},
       {d:'Inbound — US distributor',m:'Apr 18 · Wire',a:'+$510,000',out:false},
-      {d:'Payment to Shenzhen Metals Co',m:'Apr 12 · SWIFT',a:'−$195,000',out:true}
+      {d:'Payment to Shenzhen Metals Co',m:'Apr 12 · SWIFT',a:'−$195,000',out:true},
+    ],
+    insights:[
+      {sev:'h',head:'Invoice over-valuation — TBML signal',text:'12 trade invoices reviewed. Average declared value 40% above commodity market rate for equivalent metal grade. Classic trade-based ML over-invoicing pattern to transfer value cross-border.',ev:['40% above market','12 invoices','China + UAE']},
+      {sev:'h',head:'Prior SAR filed — same counterparty',text:'Shenzhen Metals Co appeared in CASE-2023-06211 (filed SAR, no prosecution). Same entity re-engaged within 12 months.',ev:['Prior SAR','CASE-2023-06211','12-month recurrence']},
     ],
     audit:[
-      {t:'10:15','txt':'Assigned to <span class="audit-who">MR</span>'},
-      {t:'09:58','txt':'Alert generated by TBML-INVOICE-007'},
-      {t:'09:58','txt':'Linked to prior case <span class="audit-who">CASE-2023-06211</span>'}
+      {t:'10:15',txt:'Assigned to <span class="audit-who">MR</span>'},
+      {t:'09:58',txt:'Alert generated by TBML-INVOICE-007'},
+      {t:'09:58',txt:'Linked to prior case <span class="audit-who">CASE-2023-06211</span>'},
     ],
     actions:[
-      {l:'Request invoice docs →', primary:true, note:'Awaiting customer docs'},
-      {l:'Check counterparties →', primary:false},
-      {l:'Disposition guidance →', primary:false}
+      {l:'Request invoice docs',note:'Awaiting customer docs',p:true},
+      {l:'Sanctions screen counterparties →',p:false},
+      {l:'Disposition guidance →',p:false},
     ]
   },
   {
-    id:'CASE-2024-08342', status:'AML / NEW', risk:71, riskClass:'risk-high',
+    id:'CASE-2024-08342', risk:71, rChip:'rc-h', vRisk:'vr-high',
     entity:'Kristopher Adler', typology:'PEP — large cash withdrawal pattern',
-    amount:'$98,750', sla:'1d 3h', slaClass:'sla-ok',
-    statusLabel:'New', statusClass:'pill-new',
-    owner:'—', ownerClass:'a-none', filter:['all','unassigned'],
-    tags:['Risk 71','PEP','Cash pattern','High net worth'],
-    tagClasses:['tag-amber','tag-amber','tag-blue','tag-gray'],
-    profile:[
-      ['Customer type','Individual — PEP',''],
-      ['Opened','Aug 2020',''],
-      ['Prior SARs','None',''],
-      ['Risk tier','High',''],
-      ['Jurisdiction','FL, USA (Dual: Colombia)','amber']
-    ],
-    summary:[
-      ['Total flagged','$98,750',''],
-      ['Txn count','8 cash w/d (14 days)',''],
-      ['Rule triggered','CASH-PEP-003',''],
-      ['All w/d','≤$9,900 each','amber']
-    ],
+    amount:'$98,750', sla:'1d 3h', slaC:'so', statusL:'New', statusC:'sp-new',
+    owner:'—', ownerC:'as-n', filter:['all','unassigned'],
+    status:'AML / NEW',
+    tags:[['Risk 71','tg-a'],['PEP','tg-a'],['Cash pattern','tg-b'],['HNW','tg-g']],
+    profile:[['Customer type','Individual — PEP',''],['Opened','Aug 2020',''],['Prior SARs','None',''],['Risk tier','High',''],['Jurisdiction','FL, USA (Dual: Colombia)','amb']],
+    summary:[['Total flagged','$98,750',''],['Txn count','8 cash w/d (14 days)',''],['Rule triggered','CASH-PEP-003',''],['All w/d','≤$9,900 each','amb']],
     spark:[20,35,40,55,60,70,80], sparkHi:[4,5,6],
     txns:[
       {d:'Cash withdrawal — Branch 44',m:'Apr 28 · ATM',a:'−$9,900',out:true},
       {d:'Cash withdrawal — Branch 12',m:'Apr 26 · Teller',a:'−$9,900',out:true},
       {d:'Deposit — wire from Bogotá',m:'Apr 25 · SWIFT',a:'+$50,000',out:false},
-      {d:'Cash withdrawal — Branch 31',m:'Apr 23 · ATM',a:'−$9,800',out:true}
+      {d:'Cash withdrawal — Branch 31',m:'Apr 23 · ATM',a:'−$9,800',out:true},
+    ],
+    insights:[
+      {sev:'h',head:'Cash structuring below CTR threshold',text:'8 cash withdrawals over 14 days, all between $9,800–$9,900. Consistent with deliberate structuring to stay below $10,000 CTR reporting threshold.',ev:['8 w/d','$9,800–$9,900','14 days']},
+      {sev:'h',head:'PEP + high-risk source jurisdiction',text:'Customer is a politically exposed person (Colombian public official). Inbound wire from Bogotá ($50,000) followed by accelerated cash withdrawals. Elevated ML risk per FATF PEP guidance.',ev:['PEP status','Bogotá inbound','FATF']},
     ],
     audit:[
-      {t:'08:00','txt':'Alert generated by CASH-PEP-003'},
-      {t:'08:00','txt':'Unassigned — pending queue'}
+      {t:'08:00',txt:'Alert generated by CASH-PEP-003'},
+      {t:'08:00',txt:'Unassigned — pending queue'},
     ],
     actions:[
-      {l:'Assign to me →', primary:true},
-      {l:'PEP screening report →', primary:false},
-      {l:'Disposition guidance →', primary:false}
+      {l:'Assign to me',note:'Unassigned',p:true},
+      {l:'PEP screening report →',p:false},
+      {l:'Disposition guidance →',p:false},
     ]
   },
   {
-    id:'CASE-2024-08291', status:'AML / NEW', risk:68, riskClass:'risk-high',
+    id:'CASE-2024-08291', risk:68, rChip:'rc-h', vRisk:'vr-high',
     entity:'NovaClear Holdings', typology:'Shell company — layered ownership',
-    amount:'$2,150,000', sla:'1d 8h', slaClass:'sla-ok',
-    statusLabel:'New', statusClass:'pill-new',
-    owner:'JL', ownerClass:'a-teal', filter:['all'],
-    tags:['Risk 68','Shell co.','UBO unknown','Wire'],
-    tagClasses:['tag-amber','tag-amber','tag-red','tag-gray'],
-    profile:[
-      ['Entity type','Holding Co. — Cayman Is.',''],
-      ['Opened','Feb 2024',''],
-      ['Prior SARs','None',''],
-      ['Risk tier','High',''],
-      ['Jurisdiction','Cayman / BVI (UBO: unknown)','red']
-    ],
-    summary:[
-      ['Total flagged','$2,150,000',''],
-      ['Txn count','3 large wires (7 days)',''],
-      ['Rule triggered','CORP-UBO-MISSING-001',''],
-      ['UBO docs','Not on file','red']
-    ],
+    amount:'$2,150,000', sla:'1d 8h', slaC:'so', statusL:'New', statusC:'sp-new',
+    owner:'JL', ownerC:'as-t', filter:['all'],
+    status:'AML / NEW',
+    tags:[['Risk 68','tg-a'],['Shell co.','tg-a'],['UBO unknown','tg-r'],['Wire','tg-g']],
+    profile:[['Entity type','Holding Co. — Cayman Is.',''],['Opened','Feb 2024',''],['Prior SARs','None',''],['Risk tier','High',''],['Jurisdiction','Cayman / BVI (UBO: unknown)','red']],
+    summary:[['Total flagged','$2,150,000',''],['Txn count','3 large wires (7 days)',''],['Rule triggered','CORP-UBO-MISSING-001',''],['UBO docs','Not on file','red']],
     spark:[0,0,0,60,80,100,0], sparkHi:[3,4,5],
     txns:[
       {d:'Wire from anonymous trust',m:'Apr 27 · SWIFT',a:'+$900,000',out:false},
       {d:'Wire to Dubai entity',m:'Apr 26 · SWIFT',a:'−$750,000',out:true},
       {d:'Wire from anonymous trust',m:'Apr 24 · SWIFT',a:'+$1,250,000',out:false},
-      {d:'Wire to Panama entity',m:'Apr 23 · SWIFT',a:'−$400,000',out:true}
+      {d:'Wire to Panama entity',m:'Apr 23 · SWIFT',a:'−$400,000',out:true},
+    ],
+    insights:[
+      {sev:'c',head:'UBO unknown — KYC deficiency',text:'Beneficial ownership documentation not on file 90 days after account opening (Feb 2024). Regulatory requirement: UBO disclosure within 30 days for legal entities.',ev:['No UBO docs','90 days overdue','Feb 2024 opened']},
+      {sev:'h',head:'Anonymous trust → offshore flow',text:'$2.15M received from unidentified trust(s), immediately forwarded to Dubai and Panama entities. Classic opacity-layering pattern using trust structures.',ev:['Anonymous trust','Dubai + Panama','Same-week out']},
     ],
     audit:[
-      {t:'07:45','txt':'Assigned to <span class="audit-who">JL</span>'},
-      {t:'07:44','txt':'Alert generated by CORP-UBO-MISSING-001'}
+      {t:'07:45',txt:'Assigned to <span class="audit-who">JL</span>'},
+      {t:'07:44',txt:'Alert generated by CORP-UBO-MISSING-001'},
     ],
     actions:[
-      {l:'Request UBO docs →', primary:true, note:'30-day KYC deadline'},
-      {l:'View network links →', primary:false},
-      {l:'Disposition guidance →', primary:false}
+      {l:'Request UBO docs',note:'30-day KYC deadline',p:true},
+      {l:'View network links →',p:false},
+      {l:'Escalate to compliance →',p:false},
     ]
   },
   {
-    id:'CASE-2024-08255', status:'AML / NEW', risk:44, riskClass:'risk-med',
+    id:'CASE-2024-08255', risk:44, rChip:'rc-m', vRisk:'vr-med',
     entity:'Priya Mehta', typology:'Peer anomaly — atypical merchant spend',
-    amount:'$14,220', sla:'2d 1h', slaClass:'sla-ok',
-    statusLabel:'New', statusClass:'pill-new',
-    owner:'SK', ownerClass:'a-blue', filter:['all'],
-    tags:['Risk 44','Peer anomaly','Retail','Card'],
-    tagClasses:['tag-gray','tag-gray','tag-gray','tag-gray'],
-    profile:[
-      ['Customer type','Individual — retail',''],
-      ['Opened','Jun 2021',''],
-      ['Prior SARs','None',''],
-      ['Risk tier','Low',''],
-      ['Jurisdiction','CA, USA','']
-    ],
-    summary:[
-      ['Total flagged','$14,220',''],
-      ['Txn count','22 card txns (7 days)',''],
-      ['Rule triggered','PEER-MERCHANT-009',''],
-      ['Anomaly','7x peer group spend','amber']
-    ],
+    amount:'$14,220', sla:'2d 1h', slaC:'so', statusL:'New', statusC:'sp-new',
+    owner:'SK', ownerC:'as-b', filter:['all'],
+    status:'AML / NEW',
+    tags:[['Risk 44','tg-g'],['Peer anomaly','tg-g'],['Retail','tg-g'],['Card','tg-g']],
+    profile:[['Customer type','Individual — retail',''],['Opened','Jun 2021',''],['Prior SARs','None',''],['Risk tier','Low',''],['Jurisdiction','CA, USA','']],
+    summary:[['Total flagged','$14,220',''],['Txn count','22 card txns (7 days)',''],['Rule triggered','PEER-MERCHANT-009',''],['Anomaly','7.4× peer group spend','amb']],
     spark:[10,12,8,14,20,60,65], sparkHi:[5,6],
     txns:[
       {d:'Nordstrom — card purchase',m:'Apr 28 · Visa',a:'−$3,400',out:true},
       {d:'Saks Fifth Ave — card purchase',m:'Apr 27 · Visa',a:'−$2,200',out:true},
       {d:'Payroll deposit',m:'Apr 25 · ACH',a:'+$6,800',out:false},
-      {d:'Neiman Marcus — card purchase',m:'Apr 24 · Visa',a:'−$1,850',out:true}
+      {d:'Neiman Marcus — card purchase',m:'Apr 24 · Visa',a:'−$1,850',out:true},
+    ],
+    insights:[
+      {sev:'m',head:'Luxury merchant spend 7.4× peer baseline',text:'22 transactions at luxury retail merchants totalling $14,220 in 7 days. Peer group average for similar profile is $1,920/month. May indicate account takeover or unusual income event.',ev:['7.4× peer avg','Luxury retail','7-day window']},
     ],
     audit:[
-      {t:'06:30','txt':'Alert generated by PEER-MERCHANT-009'}
+      {t:'06:30',txt:'Alert generated by PEER-MERCHANT-009'},
     ],
     actions:[
-      {l:'Review customer profile →', primary:true},
-      {l:'Close — no suspicious activity →', primary:false},
-      {l:'Request explanation →', primary:false}
+      {l:'Review customer profile',p:true},
+      {l:'Close — no suspicious activity →',p:false},
+      {l:'Request explanation from customer →',p:false},
     ]
   },
   {
-    id:'CASE-2024-08204', status:'AML / NEW', risk:38, riskClass:'risk-med',
+    id:'CASE-2024-08204', risk:38, rChip:'rc-m', vRisk:'vr-med',
     entity:'Blue Arch Partners', typology:'Dormant account — reactivation spike',
-    amount:'$61,400', sla:'2d 6h', slaClass:'sla-ok',
-    statusLabel:'New', statusClass:'pill-new',
-    owner:'—', ownerClass:'a-none', filter:['all','unassigned'],
-    tags:['Risk 38','Dormant','Reactivation','Wire'],
-    tagClasses:['tag-gray','tag-gray','tag-gray','tag-gray'],
-    profile:[
-      ['Entity type','Partnership',''],
-      ['Opened','Apr 2016',''],
-      ['Prior SARs','None',''],
-      ['Last activity','3 years ago','amber'],
-      ['Jurisdiction','NV, USA','']
-    ],
-    summary:[
-      ['Total flagged','$61,400',''],
-      ['Txn count','5 wires (3 days)',''],
-      ['Rule triggered','DORM-REACT-002',''],
-      ['Dormant for','38 months','amber']
-    ],
+    amount:'$61,400', sla:'2d 6h', slaC:'so', statusL:'New', statusC:'sp-new',
+    owner:'—', ownerC:'as-n', filter:['all','unassigned'],
+    status:'AML / NEW',
+    tags:[['Risk 38','tg-g'],['Dormant','tg-g'],['Reactivation','tg-a'],['Wire','tg-g']],
+    profile:[['Entity type','Partnership',''],['Opened','Apr 2016',''],['Prior SARs','None',''],['Last activity','3 years ago','amb'],['Jurisdiction','NV, USA','']],
+    summary:[['Total flagged','$61,400',''],['Txn count','5 wires (3 days)',''],['Rule triggered','DORM-REACT-002',''],['Dormant for','38 months','amb']],
     spark:[0,0,0,0,80,90,85], sparkHi:[4,5,6],
     txns:[
       {d:'Wire from unknown sender',m:'Apr 27 · SWIFT',a:'+$25,000',out:false},
       {d:'Wire to EU account',m:'Apr 27 · SWIFT',a:'−$22,000',out:true},
       {d:'Wire from unknown sender',m:'Apr 26 · SWIFT',a:'+$36,400',out:false},
-      {d:'Wire to EU account',m:'Apr 26 · SWIFT',a:'−$39,400',out:true}
+      {d:'Wire to EU account',m:'Apr 26 · SWIFT',a:'−$39,400',out:true},
+    ],
+    insights:[
+      {sev:'h',head:'Dormant reactivation — 38 months silent',text:'Account had zero activity for 38 months. Sudden reactivation with 5 wires in 3 days totalling $61,400. Dormant accounts are a known ML vector for "sleeper" structures.',ev:['38mo dormant','5 wires / 3 days','Unknown sender']},
     ],
     audit:[
-      {t:'05:15','txt':'Alert generated by DORM-REACT-002'},
-      {t:'05:15','txt':'Unassigned — pending queue'}
+      {t:'05:15',txt:'Alert generated by DORM-REACT-002'},
+      {t:'05:15',txt:'Unassigned — pending queue'},
     ],
     actions:[
-      {l:'Assign to me →', primary:true},
-      {l:'Review account history →', primary:false},
-      {l:'Disposition guidance →', primary:false}
+      {l:'Assign to me',note:'Unassigned',p:true},
+      {l:'Review account history →',p:false},
+      {l:'Disposition guidance →',p:false},
     ]
-  }
+  },
 ];
 
+// ─────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────
 let activeFilter = 'all';
-let selectedIdx = null;
+let openCases = []; // array of case IDs
+let activeTab = 'dash';
+let selectedRow = null;
+let clickTimer = null;
+const DBLCLICK_DELAY = 250; // ms
 
-function setNav(el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function setFilter(btn, f) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeFilter = f;
-  renderQueue();
-  document.getElementById('detail-panel').innerHTML = '<div class="empty-state"><div class="empty-icon">↖</div><div class="empty-text">Select an alert to investigate</div></div>';
-  selectedIdx = null;
-}
-
+// ─────────────────────────────────────
+//  QUEUE RENDER
+// ─────────────────────────────────────
 function renderQueue() {
   const list = document.getElementById('queue-list');
   const filtered = ALERTS.filter(a => a.filter.includes(activeFilter));
-  list.innerHTML = filtered.map((a, i) => `
-    <div class="alert-row${selectedIdx === a.id ? ' selected' : ''}" onclick="selectAlert('${a.id}')">
-      <div class="risk-chip ${a.riskClass}">${a.risk}</div>
+  list.innerHTML = filtered.map(a => `
+    <div class="arow${selectedRow===a.id?' sel':''}"
+      data-id="${a.id}">
+      <div class="rchip ${a.rChip}">${a.risk}</div>
       <div>
-        <div class="alert-entity">${a.entity}</div>
-        <div class="alert-typology">${a.typology}</div>
+        <div class="ae">${a.entity}</div>
+        <div class="at">${a.typology}</div>
       </div>
-      <div class="alert-amount">${a.amount}</div>
-      <div class="alert-sla ${a.slaClass}">${a.sla}</div>
-      <div><span class="status-pill ${a.statusClass}">${a.statusLabel}</span></div>
-      <div class="assignee ${a.ownerClass}">${a.owner}</div>
+      <div class="amt">${a.amount}</div>
+      <div class="asla ${a.slaC}">${a.sla}</div>
+      <div style="text-align:center"><span class="spill ${a.statusC}">${a.statusL}</span></div>
+      <div class="asn ${a.ownerC}">${a.owner}</div>
     </div>
   `).join('');
+
+  // Attach click handlers after render — avoids onclick/ondblclick conflict
+  list.querySelectorAll('.arow').forEach(row => {
+    const id = row.dataset.id;
+    row.addEventListener('click', () => {
+      if (clickTimer) {
+        // Second click within delay = double-click
+        clearTimeout(clickTimer);
+        clickTimer = null;
+        openCase(id);
+      } else {
+        // First click — wait to see if another arrives
+        clickTimer = setTimeout(() => {
+          clickTimer = null;
+          previewRow(id);
+        }, DBLCLICK_DELAY);
+      }
+    });
+  });
 }
 
-function selectAlert(id) {
-  selectedIdx = id;
+function previewRow(id) {
+  selectedRow = id;
   renderQueue();
-  const c = ALERTS.find(a => a.id === id);
-  if (!c) return;
+}
 
-  const tagHtml = c.tags.map((t,i) => `<span class="tag ${c.tagClasses[i]}">${t}</span>`).join('');
-  const profileHtml = c.profile.map(r => `
-    <div class="kv-row">
-      <span class="kv-key">${r[0]}</span>
-      <span class="kv-val ${r[2] ? r[2] : ''}">${r[1]}</span>
+function setFilter(btn, f) {
+  document.querySelectorAll('.flt').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  activeFilter = f;
+  selectedRow = null;
+  renderQueue();
+}
+
+function setNav(el, f) {
+  document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('on'));
+  el.classList.add('on');
+  activeFilter = f;
+  selectedRow = null;
+  renderQueue();
+}
+
+// ─────────────────────────────────────
+//  TAB MANAGEMENT
+// ─────────────────────────────────────
+function switchTab(tabEl, paneId) {
+  document.querySelectorAll('.vtab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById('pane-' + paneId);
+  if (pane) pane.classList.add('active');
+  activeTab = paneId;
+}
+
+function switchTabById(paneId) {
+  const tab = document.querySelector('.vtab[data-pane="' + paneId + '"]');
+  if (tab) switchTab(tab, paneId);
+}
+
+// Tab clicks wired directly in initTabs() and openCase()
+
+function openCase(id) {
+  // deduplicate
+  if (openCases.includes(id)) {
+    const tabEl = document.querySelector(`.vtab[data-pane="${id}"]`);
+    if (tabEl) switchTab(tabEl, id);
+    return;
+  }
+  openCases.push(id);
+  const c = ALERTS.find(a => a.id === id);
+
+  // Create vtab — no onclick needed, delegated listener handles it
+  const slot = document.getElementById('case-tabs-slot');
+  const tab = document.createElement('div');
+  tab.className = 'vtab';
+  tab.dataset.pane = id;
+  tab.innerHTML = `
+    <div class="vtab-inner">
+      <div class="vtab-risk ${c.vRisk}">${c.risk}</div>
+      <div class="vtab-text">${c.entity.toUpperCase()}</div>
+      <button class="vtab-close" onclick="closeCase('${id}',this)" title="Close">×</button>
+    </div>
+  `;
+  slot.insertBefore(tab, slot.lastElementChild || null);
+
+  // Wire click directly on this tab element
+  tab.addEventListener('click', function(e) {
+    if (e.target.closest('.vtab-close')) return;
+    switchTab(tab, id);
+  });
+
+  // Create pane
+  const paneSlot = document.getElementById('case-panes-slot');
+  const pane = document.createElement('div');
+  pane.className = 'pane case-pane';
+  pane.id = 'pane-' + id;
+  pane.innerHTML = buildCasePaneHTML(c);
+  paneSlot.appendChild(pane);
+
+  // Switch to it
+  switchTab(tab, id);
+}
+
+function closeCase(id, closeBtn) {
+  const idx = openCases.indexOf(id);
+  if (idx === -1) return;
+  openCases.splice(idx, 1);
+
+  // Remove tab element
+  const tab = document.querySelector(`.vtab[data-pane="${id}"]`);
+  if (tab) tab.remove();
+
+  // Remove pane
+  const pane = document.getElementById('pane-' + id);
+  if (pane) pane.remove();
+
+  // If this was active, go to dash or previous
+  if (activeTab === id) {
+    if (openCases.length > 0) {
+      const prevId = openCases[openCases.length - 1];
+      const prevTab = document.querySelector(`.vtab[data-pane="${prevId}"]`);
+      switchTab(prevTab, prevId);
+    } else {
+      const dashTab = document.querySelector('.vtab.pinned');
+      switchTab(dashTab, 'dash');
+    }
+  }
+}
+
+// ─────────────────────────────────────
+//  CASE PANE HTML
+// ─────────────────────────────────────
+function buildCasePaneHTML(c) {
+  const tags = c.tags.map(t => `<span class="tag ${t[1]}">${t[0]}</span>`).join('');
+  const profile = c.profile.map(r => `<div class="kv"><span class="kk">${r[0]}</span><span class="kv-v ${r[2]}">${r[1]}</span></div>`).join('');
+  const summary = c.summary.map(r => `<div class="kv"><span class="kk">${r[0]}</span><span class="kv-v ${r[2]}">${r[1]}</span></div>`).join('');
+  const spark = c.spark.map((h,i) => `<div class="sb${c.sparkHi.includes(i)?' hi':''}" style="height:${Math.max(h,3)}%"></div>`).join('');
+  const txns = c.txns.map(t => `
+    <div class="txn">
+      <div><div class="txn-d">${t.d}</div><div class="txn-m">${t.m}</div></div>
+      <div class="txn-a ${t.out?'to':'ti'}">${t.a}</div>
     </div>`).join('');
-  const summaryHtml = c.summary.map(r => `
-    <div class="kv-row">
-      <span class="kv-key">${r[0]}</span>
-      <span class="kv-val ${r[2] ? r[2] : ''}">${r[1]}</span>
-    </div>`).join('');
-  const sparkHtml = c.spark.map((h, i) =>
-    `<div class="spark-bar${c.sparkHi.includes(i) ? ' hi' : ''}" style="height:${Math.max(h,4)}%"></div>`
-  ).join('');
-  const txnHtml = c.txns.map(t => `
-    <div class="txn-item">
-      <div>
-        <div class="txn-desc">${t.d}</div>
-        <div class="txn-meta">${t.m}</div>
+  const insights = c.insights.map(ins => `
+    <div class="insight">
+      <div class="ins-sev sev-${ins.sev}"></div>
+      <div class="ins-body">
+        <div class="ins-head">${ins.head}</div>
+        <div class="ins-text">${ins.text}</div>
+        <div class="ins-ev">${ins.ev.map(e=>`<span class="ev-pill">${e}</span>`).join('')}</div>
       </div>
-      <div class="txn-amount ${t.out ? 'txn-out' : 'txn-in'}">${t.a}</div>
     </div>`).join('');
-  const auditHtml = c.audit.map(a => `
-    <div class="audit-item">
-      <div class="audit-time">${a.t}</div>
-      <div class="audit-text">${a.txt}</div>
+  const audit = c.audit.map(a => `
+    <div class="audit-i">
+      <div class="audit-t">${a.t}</div>
+      <div class="audit-txt">${a.txt}</div>
     </div>`).join('');
-  const actionHtml = c.actions.map(a => `
-    <button class="action-btn${a.primary ? ' primary' : ''}">
-      ${a.l}${a.note ? `<div style="font-size:10px;opacity:0.7;margin-top:2px;">${a.note}</div>` : ''}
+  const actions = c.actions.map(a => `
+    <button class="act-btn${a.p?' p':''}">
+      ${a.l}${a.note?`<div class="act-note">${a.note}</div>`:''}
     </button>`).join('');
 
-  document.getElementById('detail-panel').innerHTML = `
-    <div class="detail-header">
-      <div class="detail-case-id">${c.id} · ${c.status}</div>
-      <div class="detail-name">${c.entity}</div>
-      <div class="detail-tags">${tagHtml}</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Customer profile</div>
-      ${profileHtml}
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Alert summary</div>
-      ${summaryHtml}
-      <div class="sparkline-wrap">
-        <div class="spark-label">Daily volume — 7 days</div>
-        <div class="sparkline">${sparkHtml}</div>
+  // Network SVG placeholder
+  const netSvg = `<svg class="net-svg" width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="170" cy="100" r="22" fill="rgba(91,163,245,0.15)" stroke="rgba(91,163,245,0.4)" stroke-width="1.5"/>
+    <text x="170" y="104" text-anchor="middle" font-size="8" fill="rgba(91,163,245,0.8)" font-family="JetBrains Mono">SUBJECT</text>
+    <circle cx="60" cy="50" r="16" fill="rgba(245,96,96,0.12)" stroke="rgba(245,96,96,0.35)" stroke-width="1.2"/>
+    <text x="60" y="54" text-anchor="middle" font-size="7" fill="rgba(245,96,96,0.8)" font-family="JetBrains Mono">ORION</text>
+    <circle cx="290" cy="60" r="16" fill="rgba(245,170,64,0.12)" stroke="rgba(245,170,64,0.35)" stroke-width="1.2"/>
+    <text x="290" y="64" text-anchor="middle" font-size="7" fill="rgba(245,170,64,0.8)" font-family="JetBrains Mono">APEX</text>
+    <circle cx="80" cy="160" r="16" fill="rgba(245,170,64,0.12)" stroke="rgba(245,170,64,0.35)" stroke-width="1.2"/>
+    <text x="80" y="164" text-anchor="middle" font-size="7" fill="rgba(245,170,64,0.8)" font-family="JetBrains Mono">COASTAL</text>
+    <circle cx="280" cy="155" r="14" fill="rgba(79,216,138,0.1)" stroke="rgba(79,216,138,0.3)" stroke-width="1.2"/>
+    <text x="280" y="159" text-anchor="middle" font-size="7" fill="rgba(79,216,138,0.7)" font-family="JetBrains Mono">UNKNOWN</text>
+    <line x1="170" y1="78" x2="74" y2="62" stroke="rgba(245,96,96,0.5)" stroke-width="1.2" stroke-dasharray="4 2"/>
+    <line x1="192" y1="83" x2="276" y2="68" stroke="rgba(245,170,64,0.5)" stroke-width="1.2" stroke-dasharray="4 2"/>
+    <line x1="155" y1="115" x2="95" y2="150" stroke="rgba(79,216,138,0.4)" stroke-width="1" stroke-dasharray="4 2"/>
+    <line x1="185" y1="118" x2="266" y2="148" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4 2"/>
+    <text x="100" y="38" font-size="8" fill="rgba(245,96,96,0.6)" font-family="JetBrains Mono">−$289,500</text>
+    <text x="215" y="55" font-size="8" fill="rgba(245,170,64,0.6)" font-family="JetBrains Mono">−$88,200</text>
+  </svg>`;
+
+  return `
+    <div class="case-topbar">
+      <div class="case-topbar-l">
+        <div class="case-id">${c.id} · ${c.status}</div>
+        <div class="case-title">${c.entity}</div>
+        <div class="case-tags">${tags}</div>
+      </div>
+      <div class="case-topbar-r">
+        <button class="cbtn">Add note</button>
+        <button class="cbtn">Reassign</button>
+        <button class="cbtn danger">Dismiss</button>
+        <button class="cbtn primary">File SAR →</button>
       </div>
     </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Recent transactions</div>
-      ${txnHtml}
+
+    <div class="case-subtabs">
+      <button class="cst on" onclick="switchSubTab(this,'${c.id}','ov')">Overview</button>
+      <button class="cst" onclick="switchSubTab(this,'${c.id}','txn')">Transactions</button>
+      <button class="cst" onclick="switchSubTab(this,'${c.id}','net')">Network</button>
+      <button class="cst" onclick="switchSubTab(this,'${c.id}','sar')">SAR Draft</button>
     </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Audit trail</div>
-      ${auditHtml}
-    </div>
-    <div class="action-section">
-      ${actionHtml}
+
+    <div class="case-body">
+
+      <!-- OVERVIEW -->
+      <div class="sub-pane on" id="sub-${c.id}-ov">
+        <div class="ov-layout">
+
+          <!-- Col 1: Profile + Summary -->
+          <div class="ov-col">
+            <div class="card">
+              <div class="card-title">Customer profile</div>
+              ${profile}
+            </div>
+            <div class="card">
+              <div class="card-title">Alert summary</div>
+              ${summary}
+              <div class="sparkwrap">
+                <div class="spark-lbl">Daily volume — 7 days</div>
+                <div class="sparkline">${spark}</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Audit trail</div>
+              ${audit}
+            </div>
+          </div>
+
+          <!-- Col 2: Pattern insights -->
+          <div class="ov-col">
+            <div class="card-title" style="padding:0 0 10px">Pattern insights</div>
+            ${insights}
+            <div class="card">
+              <div class="card-title">Recent transactions</div>
+              ${txns}
+            </div>
+          </div>
+
+          <!-- Col 3: Actions -->
+          <div class="ov-col" style="border-right:none">
+            <div class="card-title" style="padding:0 0 10px">Actions</div>
+            ${actions}
+            <div class="card" style="margin-top:4px">
+              <div class="card-title">SLA</div>
+              <div class="kv"><span class="kk">Deadline</span><span class="kv-v ${c.slaC==='su'?'red':'df'}">${c.sla}</span></div>
+              <div class="kv"><span class="kk">Status</span><span class="kv-v">${c.statusL}</span></div>
+              <div class="kv"><span class="kk">Assigned</span><span class="kv-v">${c.owner === '—' ? 'Unassigned' : c.owner}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div class="sub-pane" id="sub-${c.id}-txn">
+        <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:0">
+          <div class="card-title" style="padding:0 0 12px">All transactions — ${c.entity}</div>
+          <div style="background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden">
+            <div style="display:grid;grid-template-columns:1fr 160px 100px;gap:12px;padding:8px 16px;background:var(--bg);border-bottom:1px solid var(--border)">
+              <div class="ch">Description</div><div class="ch">Reference</div><div class="ch r">Amount</div>
+            </div>
+            ${c.txns.concat(c.txns).map((t,i)=>`
+              <div style="display:grid;grid-template-columns:1fr 160px 100px;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-1)">
+                <div><div style="font-size:12.5px">${t.d}</div><div class="txn-m">${t.m}</div></div>
+                <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);align-self:center">TXN-${String(10024+i).padStart(6,'0')}</div>
+                <div class="txn-a ${t.out?'to':'ti'}" style="text-align:right;align-self:center">${t.a}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- NETWORK -->
+      <div class="sub-pane" id="sub-${c.id}-net">
+        <div class="net-pane">
+          ${netSvg}
+          <div class="net-note">Entity relationship map — ${c.entity}</div>
+          <div style="display:flex;gap:16px;font-family:var(--mono);font-size:10px;color:var(--text-3)">
+            <span style="color:var(--red)">─ ─ Wire out</span>
+            <span style="color:var(--green)">─ ─ Wire in</span>
+            <span>─ ─ Unknown</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAR DRAFT -->
+      <div class="sub-pane" id="sub-${c.id}-sar">
+        <div class="sar-pane">
+          <div class="card-title" style="padding:0">SAR filing — ${c.id}</div>
+          <div class="sar-grid">
+            <div>
+              <div class="sar-label">Subject name</div>
+              <input class="sar-input" value="${c.entity}" readonly>
+            </div>
+            <div>
+              <div class="sar-label">Filing type</div>
+              <input class="sar-input" value="Suspicious Activity Report (SAR)">
+            </div>
+            <div>
+              <div class="sar-label">Typology</div>
+              <input class="sar-input" value="${c.tags[1]?c.tags[1][0]:''}">
+            </div>
+            <div>
+              <div class="sar-label">Amount involved</div>
+              <input class="sar-input" value="${c.amount}">
+            </div>
+          </div>
+          <div>
+            <div class="sar-label">Suspicious activity narrative</div>
+            <textarea class="sar-input sar-textarea">${c.entity} was identified as engaging in suspicious activity consistent with ${c.insights[0]?c.insights[0].head.toLowerCase():'money laundering'}. ${c.insights[0]?c.insights[0].text:''} This activity was identified by rule ${c.summary[2]?c.summary[2][1]:'—'} and escalated for SAR review.</textarea>
+          </div>
+          <div>
+            <div class="sar-label">Supporting evidence</div>
+            <textarea class="sar-input sar-textarea" style="min-height:80px">${c.insights.map(i=>i.ev.join(', ')).join('\n')}</textarea>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="cbtn primary" style="font-size:13px;padding:9px 18px">Submit SAR →</button>
+            <button class="cbtn" style="font-size:13px;padding:9px 18px">Save draft</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   `;
 }
 
+function switchSubTab(btn, caseId, sub) {
+  const pane = document.getElementById('pane-' + caseId);
+  pane.querySelectorAll('.cst').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  pane.querySelectorAll('.sub-pane').forEach(p => p.classList.remove('on'));
+  const sp = document.getElementById(`sub-${caseId}-${sub}`);
+  if (sp) sp.classList.add('on');
+}
+
+// ─────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────
+function initTabs() {
+  // Wire up the pinned dashboard tab directly
+  const dashTab = document.querySelector('.vtab[data-pane="dash"]');
+  if (dashTab) {
+    dashTab.addEventListener('click', function() {
+      switchTab(dashTab, 'dash');
+    });
+  }
+}
+
 renderQueue();
-selectAlert('CASE-2024-08471');
+initTabs();
 </script>
 </body>
 </html>
