@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AML Investigation Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root {
+  --bg-primary: #F7F6F3;
+  --bg-surface: #FFFFFF;
+  --bg-surface-2: #F0EFEb;
+  --bg-sar: #0F1117;
+  --bg-sar-surface: #1A1D27;
+  --bg-sar-surface-2: #22253A;
+  --text-primary: #0F1117;
+  --text-secondary: #5C5C6E;
+  --text-tertiary: #9B9BAD;
+  --text-sar: #E8E8F0;
+  --text-sar-muted: #8A8AAD;
+  --border: rgba(15,17,23,0.1);
+  --border-strong: rgba(15,17,23,0.2);
+  --accent: #1A3CFF;
+  --accent-bg: #EEF1FF;
+  --danger: #D93025;
+  --danger-bg: #FEF2F1;
+  --warning: #C07B00;
+  --warning-bg: #FFF8E6;
+  --success: #1A7A4A;
+  --success-bg: #EDFAF4;
+  --sar-accent: #6B7FFF;
+  --sar-accent-dim: rgba(107,127,255,0.15);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --sar-width: 240px;
+  --sar-collapsed-width: 40px;
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  font-size: 13px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Top Bar ── */
+.topbar {
+  height: 44px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.topbar-case {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+}
+.topbar-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.topbar-sep { color: var(--border-strong); }
+.topbar-status {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-weight: 500;
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.topbar-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--sans);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.topbar-btn:hover { background: var(--bg-surface-2); }
+.topbar-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.topbar-btn.primary:hover { opacity: 0.9; }
+
+/* ── Main Layout ── */
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 1px;
+  background: var(--border);
+}
+
+/* ── Left Panel ── */
+.left-panel {
+  width: 252px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.panel-head-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.badge-warn { background: var(--warning-bg); color: var(--warning); }
+.badge-info { background: var(--accent-bg); color: var(--accent); }
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-neutral { background: var(--bg-surface-2); color: var(--text-secondary); }
+.badge-danger { background: var(--danger-bg); color: var(--danger); }
+
+.search-wrap {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.search-wrap input {
+  width: 100%;
+  padding: 5px 8px 5px 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  font-size: 12px;
+  font-family: var(--sans);
+  color: var(--text-primary);
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239B9BAD' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 8px center;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+
+.filter-row {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.filter-chip {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.15s;
+}
+.filter-chip:hover { border-color: var(--border-strong); }
+.filter-chip.active {
+  background: var(--text-primary);
+  color: #fff;
+  border-color: var(--text-primary);
+}
+
+.subject-list { overflow-y: auto; flex: 1; }
+
+.subject-row {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  transition: background 0.1s;
+  position: relative;
+}
+.subject-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.15s;
+}
+.subject-row:hover { background: var(--bg-surface-2); }
+.subject-row.active { background: var(--accent-bg); }
+.subject-row.active::before { background: var(--accent); }
+.subject-row.excluded { opacity: 0.4; }
+
+.risk-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.dot-h { background: var(--danger); }
+.dot-m { background: var(--warning); }
+.dot-l { background: var(--success); }
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  font-family: var(--mono);
+}
+.subj-info { flex: 1; min-width: 0; }
+.subj-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.subj-meta { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.keep-btn {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-family: var(--sans);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.keep-btn:hover { border-color: var(--border-strong); color: var(--text-secondary); }
+.keep-btn.kept {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: transparent;
+}
+
+/* ── Center Panel ── */
+.center-panel {
+  flex: 1;
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.detail-head {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.detail-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--mono);
+  flex-shrink: 0;
+}
+.detail-name { font-size: 15px; font-weight: 600; }
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+.detail-actions { margin-left: auto; display: flex; gap: 6px; }
+.action-btn {
+  font-size: 11px;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--sans);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.action-btn:hover { background: var(--bg-surface-2); }
+.action-btn.keep-action {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: transparent;
+}
+
+.tab-row {
+  display: flex;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tab {
+  font-size: 12px;
+  padding: 9px 12px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.tab:hover { color: var(--text-secondary); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.detail-body { overflow-y: auto; flex: 1; padding: 16px 18px; }
+
+.section-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.info-cell { }
+.info-key { font-size: 11px; color: var(--text-tertiary); margin-bottom: 2px; }
+.info-val { font-size: 12px; font-weight: 500; color: var(--text-primary); font-family: var(--mono); }
+
+.acct-info { flex: 1; min-width: 0; }
+.acct-num { font-size: 12px; font-weight: 500; font-family: var(--mono); }
+.acct-type { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+.acct-right { text-align: right; }
+.acct-balance { font-size: 12px; font-weight: 600; font-family: var(--mono); }
+.acct-alert { font-size: 10px; color: var(--danger); margin-top: 2px; }
+
+.activity-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+.activity-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.activity-label { font-size: 12px; font-weight: 500; }
+.activity-detail { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+/* ── Account row detail ── */
+.account-wrap { margin-bottom: 6px; }
+.account-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg-surface);
+}
+.account-wrap.expanded .account-card {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+  background: var(--bg-surface-2);
+}
+.account-card:hover { border-color: var(--border-strong); background: var(--bg-surface-2); }
+.account-card.mapped { border-color: var(--accent); background: var(--accent-bg); }
+.account-wrap.expanded .account-card.mapped { border-bottom-color: transparent; }
+.acct-expand-icon { font-size: 14px; color: var(--text-tertiary); flex-shrink: 0; transition: transform 0.2s; }
+.account-wrap.expanded .acct-expand-icon { transform: rotate(90deg); }
+.acct-excluded-wrap .account-card { opacity: 0.42; }
+.acct-kept-badge { font-size: 10px; padding: 1px 6px; border-radius: 20px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+.acct-kept-badge.kept { background: var(--success-bg); color: var(--success); }
+.acct-kept-badge.excl { background: var(--bg-surface-2); color: var(--text-tertiary); border: 1px solid var(--border); }
+
+.acct-row-detail {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  background: var(--bg-surface);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.account-wrap.expanded .acct-row-detail { max-height: 500px; }
+.account-wrap.expanded .account-card.mapped ~ .acct-row-detail { border-color: var(--accent); }
+.acct-detail-inner { padding: 12px 14px; }
+.acct-detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.acct-d-key { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.acct-d-val { font-size: 12px; font-weight: 500; font-family: var(--mono); color: var(--text-primary); }
+.acct-txn-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--border); font-size: 11px; }
+.acct-txn-date { color: var(--text-tertiary); font-family: var(--mono); width: 76px; flex-shrink: 0; }
+.acct-txn-desc { flex: 1; color: var(--text-secondary); }
+.acct-txn-amt { font-family: var(--mono); font-weight: 500; }
+.acct-txn-amt.cr { color: var(--success); }
+.acct-txn-amt.db { color: var(--danger); }
+.acct-txn-flag { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: var(--danger-bg); color: var(--danger); flex-shrink: 0; }
+.acct-detail-actions { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 6px; }
+.acct-action-btn { font-size: 11px; padding: 5px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text-secondary); cursor: pointer; font-family: var(--sans); display: flex; align-items: center; gap: 5px; transition: all 0.15s; }
+.acct-action-btn:hover { background: var(--bg-surface-2); }
+.acct-action-btn.kept { background: var(--success-bg); color: var(--success); border-color: transparent; }
+.acct-action-btn.excl { background: var(--bg-surface-2); color: var(--text-tertiary); }
+.acct-action-btn.mapped { background: var(--accent); color: #fff; border-color: transparent; }
+
+/* ── SAR Panel ── */
+.sar-panel {
+  background: var(--bg-sar);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: var(--sar-width);
+  flex-shrink: 0;
+  transition: width var(--transition);
+  position: relative;
+}
+.sar-panel.collapsed { width: var(--sar-collapsed-width); }
+
+.sar-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  min-height: 44px;
+}
+.sar-head-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-sar-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity var(--transition);
+}
+.sar-panel.collapsed .sar-head-label { opacity: 0; pointer-events: none; }
+.sar-toggle {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: var(--text-sar-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.sar-toggle:hover { background: rgba(255,255,255,0.08); color: var(--text-sar); }
+.sar-toggle i { font-size: 14px; transition: transform var(--transition); }
+.sar-panel.collapsed .sar-toggle i { transform: rotate(180deg); }
+
+.sar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity var(--transition);
+}
+.sar-panel.collapsed .sar-content { opacity: 0; pointer-events: none; }
+
+.sar-progress {
+  padding: 8px 12px 0;
+  flex-shrink: 0;
+}
+.sar-prog-label {
+  font-size: 10px;
+  color: var(--text-sar-muted);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.prog-bar {
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  background: var(--sar-accent);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+.sar-body { overflow-y: auto; flex: 1; padding: 10px; }
+
+.sar-subject-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: var(--bg-sar-surface);
+}
+.sar-subj-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+}
+.sar-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 600;
+  font-family: var(--mono);
+  flex-shrink: 0;
+}
+.sar-subj-name { font-size: 11px; font-weight: 500; color: var(--text-sar); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sar-acct-count { font-size: 10px; color: var(--text-sar-muted); }
+
+.sar-acct-pill {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--sar-accent-dim);
+  color: var(--sar-accent);
+  font-family: var(--mono);
+  display: inline-block;
+  margin: 2px 2px 0 0;
+}
+.sar-empty {
+  padding: 20px 10px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-sar-muted);
+  line-height: 1.6;
+}
+
+.sar-footer {
+  padding: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.sar-submit {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--sar-accent);
+  background: var(--sar-accent-dim);
+  color: var(--sar-accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.15s;
+}
+.sar-submit:hover { background: var(--sar-accent); color: #fff; }
+.sar-footnote { font-size: 10px; color: var(--text-sar-muted); text-align: center; margin-top: 6px; }
+
+/* SAR collapsed label */
+.sar-collapsed-label {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 56px;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+.sar-panel.collapsed .sar-collapsed-label { opacity: 1; pointer-events: auto; }
+.sar-vert-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-sar-muted);
+}
+.sar-count-bubble {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sar-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+.sar-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-case">CASE-2024-04821</span>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-name">Project Meridian</span>
+  <span class="topbar-status">In review</span>
+  <div class="topbar-right">
+    <button class="topbar-btn"><i class="ti ti-share"></i> Share</button>
+    <button class="topbar-btn"><i class="ti ti-file-text"></i> Notes</button>
+    <button class="topbar-btn primary" id="file-sar-btn"><i class="ti ti-send"></i> File SAR</button>
+  </div>
+</div>
+
+<div class="workspace">
+
+  <!-- Left: Subject List -->
+  <div class="left-panel">
+    <div class="panel-head">
+      <span class="panel-head-label">Subjects <span style="font-weight:400;opacity:0.6">(23)</span></span>
+      <span class="badge badge-warn" id="kept-badge">8 kept</span>
+    </div>
+    <div class="search-wrap">
+      <input type="text" placeholder="Search subjects…" id="search-input" />
+    </div>
+    <div class="filter-row">
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="high">High risk</button>
+      <button class="filter-chip" data-filter="kept">Kept</button>
+    </div>
+    <div class="subject-list" id="subject-list"></div>
+  </div>
+
+  <!-- Center: Detail -->
+  <div class="center-panel">
+    <div class="detail-head" id="detail-head"></div>
+    <div class="tab-row" id="tab-row"></div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- Right: SAR Panel -->
+  <div class="sar-panel" id="sar-panel">
+    <div class="sar-head">
+      <span class="sar-head-label">SAR Staging</span>
+      <button class="sar-toggle" id="sar-toggle" title="Collapse SAR panel">
+        <i class="ti ti-chevron-right"></i>
+      </button>
+    </div>
+    <div class="sar-collapsed-label">
+      <span class="sar-count-bubble" id="sar-bubble">3</span>
+      <span class="sar-vert-text">SAR staging</span>
+    </div>
+    <div class="sar-content">
+      <div class="sar-progress">
+        <div class="sar-prog-label">
+          <span>Form progress</span>
+          <span id="prog-pct">40%</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:40%"></div></div>
+      </div>
+      <div class="sar-body" id="sar-body"></div>
+      <div class="sar-footer">
+        <button class="sar-submit" id="sar-submit">Continue to form →</button>
+        <div class="sar-footnote" id="sar-footnote">5 accounts mapped</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const subjects = [
+  { id:1, name:'Marcus Webb',          initials:'MW', color:'#0C447C', bg:'#B5D4F4', risk:'high', role:'Primary subject', dob:'Mar 14 1978', ssn:'***-**-4821', nationality:'US', idType:'Passport', address:'448 Lakeview Dr, Miami FL', phone:'+1 305 555 0148', employer:'Self-employed', income:'$120,000', kept:true },
+  { id:2, name:'Elaine Tran',          initials:'ET', color:'#27500A', bg:'#C0DD97', risk:'high', role:'Associate',       dob:'Jul 02 1985', ssn:'***-**-7732', nationality:'US', idType:'Driver license', address:'12 Ocean Ave, Fort Lauderdale FL', phone:'+1 954 555 0291', employer:'Tran Consulting LLC', income:'$85,000', kept:true },
+  { id:3, name:'Horizon LLC',          initials:'HL', color:'#712B13', bg:'#F5C4B3', risk:'med',  role:'Entity',          dob:'N/A', ssn:'EIN 82-4401923', nationality:'US', idType:'EIN', address:'3300 NW 79th Ave, Doral FL', phone:'+1 305 555 0044', employer:'N/A', income:'See financials', kept:true },
+  { id:4, name:'David Park',           initials:'DP', color:'#3C3489', bg:'#CECBF6', risk:'low',  role:'Secondary',       dob:'Nov 19 1990', ssn:'***-**-1144', nationality:'US', idType:'Driver license', address:'900 Brickell Key Blvd, Miami FL', phone:'+1 786 555 0318', employer:'Park & Associates', income:'$210,000', kept:false },
+  { id:5, name:'First National Trust', initials:'FN', color:'#085041', bg:'#9FE1CB', risk:'med',  role:'Entity',          dob:'N/A', ssn:'EIN 59-1023847', nationality:'US', idType:'EIN', address:'200 SE 1st St, Miami FL', phone:'+1 305 555 0500', employer:'N/A', income:'See financials', kept:false },
+  { id:6, name:'Carla Reyes',          initials:'CR', color:'#72243E', bg:'#F4C0D1', risk:'high', role:'Associate',       dob:'Apr 30 1982', ssn:'***-**-9901', nationality:'US', idType:'Passport', address:'7711 SW 134th St, Kendall FL', phone:'+1 305 555 0177', employer:'Self-employed', income:'$95,000', kept:true },
+  { id:7, name:'Pinnacle Advisory',    initials:'PA', color:'#633806', bg:'#FAC775', risk:'med',  role:'Entity',          dob:'N/A', ssn:'EIN 47-8831204', nationality:'US', idType:'EIN', address:'1 SE 3rd Ave, Miami FL', phone:'+1 305 555 0622', employer:'N/A', income:'See financials', kept:false },
+  { id:8, name:'Thomas Kwan',          initials:'TK', color:'#0F1117', bg:'#D3D1C7', risk:'low',  role:'Secondary',       dob:'Feb 08 1995', ssn:'***-**-3308', nationality:'US', idType:'Driver license', address:'321 Collins Ave, Miami Beach FL', phone:'+1 786 555 0409', employer:'Kwan Imports Inc', income:'$140,000', kept:false },
+];
+
+const accountsData = {
+  1:[
+    { num:'****4821', type:'Checking',     bank:'Chase',          balance:'$248,310', opened:'Jan 2019', status:'Active',   alert:'Structuring pattern',   mapped:true,  kept:true,
+      txns:[{date:'2024-04-01',desc:'Cash deposit',amt:'+$8,900',flag:true},{date:'2024-03-28',desc:'Wire — Horizon LLC',amt:'-$120,000',flag:true},{date:'2024-03-21',desc:'Cash deposit',amt:'+$8,500',flag:true},{date:'2024-03-14',desc:'ACH payroll',amt:'+$4,200',flag:false}] },
+    { num:'****9903', type:'Savings',      bank:'Chase',          balance:'$91,200',  opened:'Mar 2020', status:'Active',   alert:'',                      mapped:true,  kept:true,
+      txns:[{date:'2024-03-30',desc:'Transfer from ****4821',amt:'+$50,000',flag:false},{date:'2024-02-15',desc:'Interest credit',amt:'+$48',flag:false}] },
+    { num:'****3317', type:'Wire account', bank:'Citibank',       balance:'$1.2M',    opened:'Aug 2021', status:'Active',   alert:'Unusual wire activity',  mapped:true,  kept:true,
+      txns:[{date:'2024-04-03',desc:'Outbound wire — Panama',amt:'-$350,000',flag:true},{date:'2024-03-29',desc:'Inbound wire — Horizon LLC',amt:'+$500,000',flag:true},{date:'2024-03-10',desc:'Outbound wire — Cayman',amt:'-$280,000',flag:true}] },
+    { num:'****7741', type:'Biz checking', bank:'Bank of America', balance:'$44,000', opened:'Jun 2022', status:'Active',   alert:'',                      mapped:false, kept:true,
+      txns:[{date:'2024-04-02',desc:'Vendor payment — Pinnacle',amt:'-$12,000',flag:false},{date:'2024-03-18',desc:'Client receipt',amt:'+$30,000',flag:false}] },
+  ],
+  2:[
+    { num:'****2210', type:'Checking',    bank:'Wells Fargo',    balance:'$32,100',  opened:'May 2018', status:'Active',   alert:'',                      mapped:false, kept:true,
+      txns:[{date:'2024-04-01',desc:'Direct deposit',amt:'+$7,100',flag:false},{date:'2024-03-15',desc:'Transfer to savings',amt:'-$5,000',flag:false}] },
+    { num:'****5567', type:'Savings',     bank:'Wells Fargo',    balance:'$180,000', opened:'May 2018', status:'Active',   alert:'Rapid deposits',         mapped:true,  kept:true,
+      txns:[{date:'2024-04-02',desc:'Transfer from checking',amt:'+$40,000',flag:true},{date:'2024-03-25',desc:'Transfer from checking',amt:'+$35,000',flag:true},{date:'2024-03-10',desc:'Transfer from checking',amt:'+$30,000',flag:true}] },
+    { num:'****8823', type:'CD',          bank:'Wells Fargo',    balance:'$250,000', opened:'Jan 2023', status:'Active',   alert:'',                      mapped:false, kept:false,
+      txns:[{date:'2024-01-01',desc:'CD opened',amt:'+$250,000',flag:false}] },
+  ],
+  3:[
+    { num:'****0012', type:'Commercial',  bank:'Citibank',       balance:'$4.1M',    opened:'Nov 2020', status:'Active',   alert:'Shell co. indicators',  mapped:true,  kept:true,
+      txns:[{date:'2024-04-04',desc:'Wire inbound — unknown',amt:'+$1,200,000',flag:true},{date:'2024-04-01',desc:'Wire outbound — Panama',amt:'-$900,000',flag:true},{date:'2024-03-20',desc:'Wire inbound',amt:'+$800,000',flag:true}] },
+    { num:'****1194', type:'Operating',   bank:'Citibank',       balance:'$890,000', opened:'Nov 2020', status:'Active',   alert:'',                      mapped:false, kept:true,
+      txns:[{date:'2024-04-03',desc:'Vendor payments',amt:'-$45,000',flag:false},{date:'2024-03-30',desc:'Revenue receipt',amt:'+$120,000',flag:false}] },
+    { num:'****3388', type:'Wire account',bank:'HSBC',           balance:'$2.3M',    opened:'Feb 2022', status:'Active',   alert:'Cross-border wires',    mapped:false, kept:false,
+      txns:[{date:'2024-04-02',desc:'Wire — Hong Kong',amt:'-$500,000',flag:true},{date:'2024-03-28',desc:'Wire — Cayman',amt:'-$750,000',flag:true}] },
+  ],
+  6:[
+    { num:'****6610', type:'Checking',    bank:'TD Bank',        balance:'$78,400',  opened:'Sep 2021', status:'Active',   alert:'',                      mapped:false, kept:true,
+      txns:[{date:'2024-04-01',desc:'Cash deposit',amt:'+$9,000',flag:true},{date:'2024-03-20',desc:'Zelle transfer',amt:'-$4,500',flag:false}] },
+    { num:'****4412', type:'Savings',     bank:'TD Bank',        balance:'$210,000', opened:'Sep 2021', status:'Active',   alert:'Cash intensive',        mapped:false, kept:false,
+      txns:[{date:'2024-04-01',desc:'Transfer from checking',amt:'+$9,000',flag:false},{date:'2024-03-10',desc:'Transfer from checking',amt:'+$15,000',flag:false}] },
+  ],
+};
+
+let selected = 1;
+let activeTab = 'details';
+let activeFilter = 'all';
+let sarCollapsed = false;
+const keptState   = {};
+const mappedState = {};
+const acctKeptState = {};
+const expandedAccts = new Set();
+
+subjects.forEach(s => { keptState[s.id] = s.kept; });
+Object.entries(accountsData).forEach(([sid, accts]) => {
+  accts.forEach((a,i) => {
+    mappedState[`${sid}-${i}`] = a.mapped;
+    acctKeptState[`${sid}-${i}`] = a.kept;
+  });
+});
+
+/* ── Render Subjects ── */
+function renderSubjects() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const list = document.getElementById('subject-list');
+  const kept = subjects.filter(s => keptState[s.id]);
+  document.getElementById('kept-badge').textContent = `${kept.length} kept`;
+
+  const filtered = subjects.filter(s => {
+    if (q && !s.name.toLowerCase().includes(q)) return false;
+    if (activeFilter === 'high' && s.risk !== 'high') return false;
+    if (activeFilter === 'kept' && !keptState[s.id]) return false;
+    return true;
+  });
+
+  const acctCounts = {};
+  subjects.forEach(s => {
+    const accts = accountsData[s.id] || [];
+    acctCounts[s.id] = accts.length;
+  });
+
+  list.innerHTML = filtered.map(s => {
+    const isActive = s.id === selected;
+    const isKept   = keptState[s.id];
+    const dotCls   = s.risk === 'high' ? 'dot-h' : s.risk === 'med' ? 'dot-m' : 'dot-l';
+    return `<div class="subject-row ${isActive?'active':''} ${!isKept?'excluded':''}" onclick="selectSubject(${s.id})">
+      <div class="risk-dot ${dotCls}"></div>
+      <div class="avatar" style="background:${s.bg};color:${s.color}">${s.initials}</div>
+      <div class="subj-info">
+        <div class="subj-name">${s.name}</div>
+        <div class="subj-meta">${s.role} · ${acctCounts[s.id]||0} accts</div>
+      </div>
+      <button class="keep-btn ${isKept?'kept':''}" onclick="event.stopPropagation();toggleKeep(${s.id})">${isKept?'✓ Kept':'Keep'}</button>
+    </div>`;
+  }).join('');
+}
+
+/* ── Render Detail ── */
+function renderDetail() {
+  const s = subjects.find(x => x.id === selected);
+  const accts = accountsData[selected] || [];
+  const isKept = keptState[s.id];
+
+  document.getElementById('detail-head').innerHTML = `
+    <div class="detail-avatar" style="background:${s.bg};color:${s.color}">${s.initials}</div>
+    <div>
+      <div class="detail-name">${s.name}</div>
+      <div class="detail-meta">
+        <span class="badge ${s.risk==='high'?'badge-danger':s.risk==='med'?'badge-warn':'badge-neutral'}">${s.risk==='high'?'High risk':s.risk==='med'?'Medium':'Low'}</span>
+        <span style="font-size:11px;color:var(--text-secondary)">${s.role}</span>
+        ${isKept?'<span class="badge badge-success">Kept</span>':'<span class="badge badge-neutral">Excluded</span>'}
+      </div>
+    </div>
+    <div class="detail-actions">
+      <button class="action-btn ${isKept?'keep-action':''}" onclick="toggleKeep(${s.id})">
+        <i class="ti ${isKept?'ti-check':'ti-plus'}"></i> ${isKept?'Keeping':'Keep subject'}
+      </button>
+    </div>`;
+
+  const keptAccts  = accts.filter((_,i) => acctKeptState[`${selected}-${i}`]);
+  const mappedAccts= accts.filter((_,i) => mappedState[`${selected}-${i}`]);
+
+  document.getElementById('tab-row').innerHTML = `
+    <div class="tab ${activeTab==='details'?'active':''}" onclick="setTab('details')">Subject details</div>
+    <div class="tab ${activeTab==='accounts'?'active':''}" onclick="setTab('accounts')">Accounts (${accts.length})</div>
+    <div class="tab ${activeTab==='activity'?'active':''}" onclick="setTab('activity')">Activity signals</div>`;
+
+  let html = '';
+
+  if (activeTab === 'details') {
+    html = `
+    <div class="section-title">Identity</div>
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-key">Date of birth</div><div class="info-val">${s.dob}</div></div>
+      <div class="info-cell"><div class="info-key">SSN / EIN</div><div class="info-val">${s.ssn}</div></div>
+      <div class="info-cell"><div class="info-key">Nationality</div><div class="info-val">${s.nationality}</div></div>
+      <div class="info-cell"><div class="info-key">ID type</div><div class="info-val">${s.idType}</div></div>
+    </div>
+    <div class="section-title">Contact</div>
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-key">Address</div><div class="info-val" style="font-family:var(--sans);font-size:12px">${s.address}</div></div>
+      <div class="info-cell"><div class="info-key">Phone</div><div class="info-val">${s.phone}</div></div>
+      <div class="info-cell"><div class="info-key">Employer</div><div class="info-val" style="font-family:var(--sans);font-size:12px">${s.employer}</div></div>
+      <div class="info-cell"><div class="info-key">Annual income</div><div class="info-val">${s.income}</div></div>
+    </div>
+    <div class="section-title">Case summary</div>
+    <div style="display:flex;gap:12px">
+      <div style="flex:1;background:var(--bg-surface-2);border-radius:var(--radius-md);padding:10px 12px">
+        <div class="info-key">Accounts</div><div style="font-size:18px;font-weight:600;font-family:var(--mono);margin-top:4px">${accts.length}</div>
+      </div>
+      <div style="flex:1;background:var(--success-bg);border-radius:var(--radius-md);padding:10px 12px">
+        <div class="info-key" style="color:var(--success)">Kept</div><div style="font-size:18px;font-weight:600;font-family:var(--mono);margin-top:4px;color:var(--success)">${keptAccts.length}</div>
+      </div>
+      <div style="flex:1;background:var(--accent-bg);border-radius:var(--radius-md);padding:10px 12px">
+        <div class="info-key" style="color:var(--accent)">Mapped to SAR</div><div style="font-size:18px;font-weight:600;font-family:var(--mono);margin-top:4px;color:var(--accent)">${mappedAccts.length}</div>
+      </div>
+    </div>`;
+
+  } else if (activeTab === 'accounts') {
+    html = `<div class="section-title">Accounts — expand for detail · keep to include · map to SAR</div>`;
+    if (!accts.length) {
+      html += `<div style="padding:20px;text-align:center;color:var(--text-tertiary);font-size:12px">No account data pulled for this subject</div>`;
+    } else {
+      html += accts.map((a,i) => {
+        const key = `${selected}-${i}`;
+        const isMapped  = mappedState[key];
+        const isKeptA   = acctKeptState[key];
+        const isExpanded= expandedAccts.has(key);
+        const txnHtml = (a.txns||[]).map(t =>
+          `<div class="acct-txn-row">
+            <span class="acct-txn-date">${t.date}</span>
+            <span class="acct-txn-desc">${t.desc}</span>
+            <span class="acct-txn-amt ${t.amt.startsWith('+')?'cr':'db'}">${t.amt}</span>
+            ${t.flag?'<span class="acct-txn-flag">Flag</span>':''}
+          </div>`).join('');
+        return `<div class="account-wrap ${isExpanded?'expanded':''} ${!isKeptA?'acct-excluded-wrap':''}" id="wrap-${key}">
+          <div class="account-card ${isMapped?'mapped':''}" onclick="toggleExpand('${key}')">
+            <i class="ti ti-chevron-right acct-expand-icon"></i>
+            <i class="ti ti-building-bank acct-icon" style="font-size:18px;color:${isMapped?'var(--accent)':'var(--text-tertiary)'}"></i>
+            <div class="acct-info">
+              <div class="acct-num">${a.num}</div>
+              <div class="acct-type">${a.type} · ${a.bank}</div>
+            </div>
+            <div class="acct-right" style="text-align:right">
+              <div class="acct-balance" style="font-size:12px;font-weight:600;font-family:var(--mono)">${a.balance}</div>
+              ${a.alert?`<div class="acct-alert" style="font-size:10px;color:var(--danger);margin-top:2px"><i class="ti ti-alert-triangle" style="font-size:10px"></i> ${a.alert}</div>`:''}
+            </div>
+            <span class="acct-kept-badge ${isKeptA?'kept':'excl'}">${isKeptA?'Kept':'Excluded'}</span>
+            ${isMapped?'<span class="acct-kept-badge kept" style="background:var(--accent-bg);color:var(--accent)">Mapped</span>':''}
+          </div>
+          <div class="acct-row-detail">
+            <div class="acct-detail-inner">
+              <div class="acct-detail-grid">
+                <div><div class="acct-d-key">Account #</div><div class="acct-d-val">${a.num}</div></div>
+                <div><div class="acct-d-key">Type</div><div class="acct-d-val">${a.type}</div></div>
+                <div><div class="acct-d-key">Institution</div><div class="acct-d-val" style="font-family:var(--sans)">${a.bank}</div></div>
+                <div><div class="acct-d-key">Balance</div><div class="acct-d-val">${a.balance}</div></div>
+                <div><div class="acct-d-key">Opened</div><div class="acct-d-val">${a.opened}</div></div>
+                <div><div class="acct-d-key">Status</div><div class="acct-d-val" style="color:var(--success)">${a.status}</div></div>
+              </div>
+              <div class="acct-d-key" style="margin-bottom:4px">Recent transactions</div>
+              ${txnHtml}
+              <div class="acct-detail-actions">
+                <button class="acct-action-btn ${isKeptA?'kept':'excl'}" onclick="toggleAcctKeep('${key}')">
+                  <i class="ti ${isKeptA?'ti-check':'ti-x'}"></i> ${isKeptA?'Keeping account':'Excluded'}
+                </button>
+                <button class="acct-action-btn ${isMapped?'mapped':''}" onclick="toggleMap('${key}')">
+                  <i class="ti ${isMapped?'ti-check':'ti-plus'}"></i> ${isMapped?'Mapped to SAR':'Map to SAR'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+  } else {
+    html = `<div class="section-title">Risk signals</div>
+    ${[
+      {icon:'ti-arrow-bar-up',    label:'Large cash deposits',  detail:'12 transactions > $9,000 in 90 days', c:'var(--danger)'},
+      {icon:'ti-arrows-exchange', label:'Rapid fund movement',  detail:'Avg hold time < 48 hrs before wire',  c:'var(--warning)'},
+      {icon:'ti-world',           label:'Cross-border wires',   detail:'7 wires to high-risk jurisdictions',  c:'var(--danger)'},
+      {icon:'ti-chart-line',      label:'Volume velocity spike',detail:'430% increase vs prior year',         c:'var(--warning)'},
+    ].map(a => `<div class="activity-item">
+      <i class="ti ${a.icon} activity-icon" style="color:${a.c}"></i>
+      <div><div class="activity-label">${a.label}</div><div class="activity-detail">${a.detail}</div></div>
+    </div>`).join('')}`;
+  }
+  document.getElementById('detail-body').innerHTML = html;
+}
+
+/* ── Render SAR ── */
+function renderSAR() {
+  const keptSubjects = subjects.filter(s => keptState[s.id]);
+  let totalMapped = 0;
+  let totalKeptAccts = 0;
+
+  const body = document.getElementById('sar-body');
+  if (!keptSubjects.length) {
+    body.innerHTML = `<div class="sar-empty">No subjects kept yet.<br>Toggle Keep on subjects to stage them here.</div>`;
+  } else {
+    body.innerHTML = keptSubjects.map(s => {
+      const accts = accountsData[s.id] || [];
+      const mapped = accts.filter((_,i) => mappedState[`${s.id}-${i}`]);
+      const keptA  = accts.filter((_,i) => acctKeptState[`${s.id}-${i}`]);
+      totalMapped    += mapped.length;
+      totalKeptAccts += keptA.length;
+      return `<div class="sar-subject-card">
+        <div class="sar-subj-row">
+          <div class="sar-avatar" style="background:${s.bg};color:${s.color}">${s.initials}</div>
+          <span class="sar-subj-name">${s.name}</span>
+          <span class="sar-acct-count">${mapped.length}/${accts.length}</span>
+        </div>
+        ${mapped.length ? mapped.map(a => `<span class="sar-acct-pill">${a.num}</span>`).join('') : `<span style="font-size:10px;color:var(--text-sar-muted)">No accounts mapped</span>`}
+      </div>`;
+    }).join('');
+  }
+
+  const pct = keptSubjects.length ? Math.min(100, Math.round((totalMapped / Math.max(totalKeptAccts,1)) * 60 + (keptSubjects.length / subjects.length) * 40)) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent  = pct + '%';
+  document.getElementById('sar-footnote').textContent = `${totalMapped} accounts mapped`;
+  document.getElementById('sar-bubble').textContent   = keptSubjects.length;
+}
+
+/* ── Interactions ── */
+function selectSubject(id) { selected = id; expandedAccts.clear(); renderSubjects(); renderDetail(); }
+function setTab(t) { activeTab = t; renderDetail(); }
+function toggleKeep(id) { keptState[id] = !keptState[id]; renderSubjects(); renderDetail(); renderSAR(); }
+function toggleMap(key) { mappedState[key] = !mappedState[key]; renderDetail(); renderSAR(); }
+function toggleAcctKeep(key) { acctKeptState[key] = !acctKeptState[key]; renderDetail(); renderSAR(); }
+function toggleExpand(key) {
+  if (expandedAccts.has(key)) expandedAccts.delete(key);
+  else expandedAccts.add(key);
+  renderDetail();
+}
+
+document.getElementById('sar-toggle').addEventListener('click', () => {
+  sarCollapsed = !sarCollapsed;
+  document.getElementById('sar-panel').classList.toggle('collapsed', sarCollapsed);
+});
+
+document.querySelectorAll('.filter-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    renderSubjects();
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', renderSubjects);
+document.getElementById('file-sar-btn').addEventListener('click', () => alert('SAR filing flow would open here.'));
+document.getElementById('sar-submit').addEventListener('click', () => alert('Continue to form — connects to your SAR authoring flow.'));
+
+/* ── Init ── */
+renderSubjects(); renderDetail(); renderSAR();
+</script>
+</body>
+</html>
